@@ -19,6 +19,9 @@ mongoose.connect(process.env.MONGODB_URI)
         console.log("error connecting to the database")
         console.log(err)
     })
+app.use((req, res) => {
+  res.status(404).json({ message: 'Endpoint not found' });
+});
 
 
 // apply to all routes
