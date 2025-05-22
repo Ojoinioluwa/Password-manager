@@ -7,6 +7,7 @@ const UserVerification = require("../models/UserVerification");
 const validator = require("validator")
 
 
+
 // TODO: ensure to make sure that the user is verified to be able to login or continue with the action
 
 
@@ -79,7 +80,7 @@ const userController = {
         if (user.expiresAt < new Date()) {
             await UserVerification.findByIdAndDelete(user._id)
             sendMail({
-                _id: req.user,
+                _id: req.user.id,
                 email: userInfo.email,
                 firstName: userInfo.firstName
             })
@@ -159,6 +160,20 @@ const userController = {
                 firstName: user.firstName,
                 lastName: user.lastName
             }
+        })
+    }),
+
+    // get user profile
+    getUserProfile: asyncHandler(async(req,res)=> {
+        const user = await User.findById(req.user).select("-password").lean();
+        if(!user){
+            res.status(401)
+            throw new Error("User does not exist please try again")
+        }
+
+        res.status(200).json({
+            message: "Fetched user profile successfully",
+            user
         })
     })
 
