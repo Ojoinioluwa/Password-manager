@@ -78,7 +78,7 @@ Before getting started, ensure you have the following installed on your local ma
 
 1.  **Clone the repository** 
 ```bash
-    git clone [https://github.com/Ojoinioluwa/Password-manager.git](https://github.com/Ojoinioluwa/Password-manager.git)
+    git clone https://github.com/Ojoinioluwa/Password-manager.git
     cd Password-manager/backend
  ```
 2.  **Install dependencies** 
