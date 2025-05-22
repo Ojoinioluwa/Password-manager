@@ -76,13 +76,15 @@ Before getting started, ensure you have the following installed on your local ma
 
 ## Installation
 
-1.  **Clone the repository** ```bash
+1.  **Clone the repository** 
+```bash
     git clone [https://github.com/Ojoinioluwa/Password-manager.git](https://github.com/Ojoinioluwa/Password-manager.git)
     cd Password-manager/backend
-    ```
-2.  **Install dependencies** ```bash
+ ```
+2.  **Install dependencies** 
+```bash
     npm install
-    ```
+```
 3.  **Set up environment variables** Create a `.env` file in the `backend/` directory (see Configuration below for details).
 
 ---
