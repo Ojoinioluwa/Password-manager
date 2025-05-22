@@ -3,6 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const errorhandler = require("./middlewares/errorHandler");
 const userRouter = require("./routes/user/userRouter");
+const limiter = require("./middlewares/rateLimiter");
+const helmet = require('helmet');
 
 const app = express();
 const PORT = process.env.PORT || 8000
@@ -10,16 +12,20 @@ const PORT = process.env.PORT || 8000
 
 // connect to mongoDB
 mongoose.connect(process.env.MONGODB_URI)
-    .then(()=> {
+    .then(() => {
         console.log("MongoDb connected succesfully")
     })
-    .catch((err)=> {
+    .catch((err) => {
         console.log("error connecting to the database")
         console.log(err)
     })
 
 
+// apply to all routes
 app.use(express.json());
+app.use(limiter)
+app.use(helmet());
+
 
 
 // consume the routes
@@ -33,6 +39,6 @@ app.use("/api/v1", userRouter)
 app.use(errorhandler)
 
 
-app.listen(PORT, ()=> {
+app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
 })
