@@ -1,0 +1,38 @@
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const errorhandler = require("./middlewares/errorHandler");
+const userRouter = require("./routes/user/userRouter");
+
+const app = express();
+const PORT = process.env.PORT || 8000
+
+
+// connect to mongoDB
+mongoose.connect(process.env.MONGODB_URI)
+    .then(()=> {
+        console.log("MongoDb connected succesfully")
+    })
+    .catch((err)=> {
+        console.log("error connecting to the database")
+        console.log(err)
+    })
+
+
+app.use(express.json());
+
+
+// consume the routes
+app.use("/api/v1", userRouter)
+
+
+
+
+
+// consume the errorhandler middleware
+app.use(errorhandler)
+
+
+app.listen(PORT, ()=> {
+    console.log(`Server is running on port ${PORT}`)
+})
