@@ -5,6 +5,7 @@ const errorhandler = require("./middlewares/errorHandler");
 const userRouter = require("./routes/user/userRouter");
 const limiter = require("./middlewares/rateLimiter");
 const helmet = require('helmet');
+const cors = require("cors")
 
 const app = express();
 const PORT = process.env.PORT || 8000
@@ -19,9 +20,12 @@ mongoose.connect(process.env.MONGODB_URI)
         console.log("error connecting to the database")
         console.log(err)
     })
-app.use((req, res) => {
-  res.status(404).json({ message: 'Endpoint not found' });
-});
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+}));
+
 
 
 // apply to all routes
@@ -35,6 +39,11 @@ app.use(helmet());
 app.use("/api/v1", userRouter)
 
 
+
+// handle route not found
+app.use((req, res) => {
+    res.status(404).json({ message: 'Endpoint not found' });
+});
 
 
 

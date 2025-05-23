@@ -70,7 +70,7 @@ const userController = {
     // verify the user
     verifyUser: asyncHandler(async (req, res) => {
 
-        const { otp, email } = req.body
+        const { verificationCode, email } = req.body
         const userInfo = await User.findOne({ email });
         const user = await UserVerification.findOne({ userId: userInfo._id })
         if (!user) {
@@ -85,12 +85,12 @@ const userController = {
                 firstName: userInfo.firstName
             })
 
-            res.status(200).json({
+           return  res.status(200).json({
                 message: "Verification email sent again because this has expired. Check your mail"
             })
         }
 
-        const isMatch = await bcrypt.compare(otp, user.verificationCode);
+        const isMatch = await bcrypt.compare(verificationCode, user.verificationCode);
         if (!isMatch) {
             res.status(400)
             throw new Error("Wrong verification code or verification code has expired, check your email again for new code or input correct code")
@@ -98,7 +98,7 @@ const userController = {
 
         userInfo.verified = true
         await userInfo.save()
-
+        await UserVerification.findOneAndDelete(user._id)
         res.status(200).json({
             message: "User email verified succesfully"
         })
