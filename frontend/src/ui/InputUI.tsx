@@ -7,14 +7,16 @@ export const InputField = ({
   name,
   label,
   type = "text",
-  size="medium",
+  size = "medium",
+  helperText,
 }: {
   formik: FormikProps<any>;
   isPending: boolean;
   name: string;
   label: string;
   type: string;
-  size: "medium" | "small" 
+  size: "medium" | "small";
+  helperText?: string;
 }) => {
   return (
     <div>
@@ -28,6 +30,7 @@ export const InputField = ({
         fullWidth
         value={formik.values[name]}
         onChange={formik.handleChange(`${name}`)}
+        helperText={helperText || undefined}
       />
       {formik.touched[name] && typeof formik.errors[name] === "string" && (
         <p className="text-red-500 text-sm">{formik.errors[name]}</p>

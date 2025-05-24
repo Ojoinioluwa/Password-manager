@@ -2,6 +2,7 @@ import axios from "axios"
 import catchAxiosError from "../../utils/catchAxiosError"
 import type { Login, LoginResponse, User, VerifyEmail } from "../../types/userType"
 import { BASE_URL } from '../../utils/url';
+import { getUserFromStorage } from "../../utils/getUserFromStorage";
 
 
 export const LoginAPI = async ({ email, password }: Login): Promise<LoginResponse> => {
@@ -31,5 +32,18 @@ export const VerifyEmailAPI = async({email, verificationCode}: VerifyEmail) => {
     } catch (error) {
         catchAxiosError(error, "VerifyEmailAPI Error")
         throw error
+    }
+}
+
+export const GetUserAPI = async()=> {
+    try {
+        const user = await getUserFromStorage()
+        const token = user?.token
+        const response = await axios.get(`${BASE_URL}/getuserProfile`, { headers: {
+            Authorization: `Bearer ${token}`
+        }})
+        return response.data
+    } catch (error) {
+        catchAxiosError(error, "GetUserAPI")
     }
 }

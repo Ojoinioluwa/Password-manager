@@ -2,7 +2,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import {  VerifyEmailAPI } from "../../services/user/userServices";
-import { InputField } from "../../ui/auth/InputUI";
+import { InputField } from "../../ui/InputUI";
 import { ButtonUI } from "../../ui/ButtonUI";
 import { useNavigate } from "react-router-dom";
 

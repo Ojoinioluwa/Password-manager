@@ -8,7 +8,7 @@ import type { RegisterForm } from "../../types/userType";
 import { useMutation } from "@tanstack/react-query";
 import { RegisterAPI } from "../../services/user/userServices";
 import RegisterImage from "../../assets/Register.jpeg";
-import { InputField } from "../../ui/auth/InputUI";
+import { InputField } from "../../ui/InputUI";
 import { ButtonUI } from "../../ui/ButtonUI";
 import { useNavigate } from "react-router-dom";
 

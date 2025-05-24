@@ -4,7 +4,8 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const UserVerification = require("../models/UserVerification");
-const validator = require("validator")
+const validator = require("validator");
+const { createSalt } = require("../utils/genSalt");
 
 
 
@@ -44,27 +45,28 @@ const userController = {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+        const userSalt = createSalt()
 
         const user = await User.create({
             firstName,
             lastName,
             email,
             password: hashedPassword,
-            phoneNumber
+            phoneNumber,
+            salt: userSalt
         })
 
-        await sendMail({
-            _id: user._id,
-            email: user.email,
-            firstName: user.firstName
-        })
-            .then((response) => {
-                res.status(200).json(response)
-            })
-            .catch((err) => {
-                console.log(err);
-                throw new Error(err)
-            })
+        try {
+            const response = await sendMail({
+                _id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+            });
+            return res.status(200).json(response);
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Error sending confirmation email.' });
+        }
     }),
 
     // verify the user
@@ -85,7 +87,7 @@ const userController = {
                 firstName: userInfo.firstName
             })
 
-           return  res.status(200).json({
+            return res.status(200).json({
                 message: "Verification email sent again because this has expired. Check your mail"
             })
         }
@@ -164,9 +166,9 @@ const userController = {
     }),
 
     // get user profile
-    getUserProfile: asyncHandler(async(req,res)=> {
-        const user = await User.findById(req.user).select("-password").lean();
-        if(!user){
+    getUserProfile: asyncHandler(async (req, res) => {
+        const user = await User.findById(req.user.id).select("-password").lean();
+        if (!user) {
             res.status(401)
             throw new Error("User does not exist please try again")
         }

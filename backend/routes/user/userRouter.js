@@ -1,6 +1,7 @@
 const express = require("express");
 const userController = require("../../controller/userCtrl");
 const authLimiter = require("../../middlewares/authLimiter");
+const isAuthenticated = require("../../middlewares/isAuth");
 
 // instantiate the user router
 const userRouter = express.Router();
@@ -16,6 +17,6 @@ userRouter.post('/auth/login', authLimiter, userController.login)
 userRouter.post("/auth/verify-user", userController.verifyUser)
 
 // get users profile
-userRouter.post("/getuserProfile", userController.getUserProfile)
+userRouter.post("/getuserProfile", isAuthenticated, userController.getUserProfile)
 
 module.exports = userRouter

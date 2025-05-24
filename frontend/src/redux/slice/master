@@ -1,0 +1,21 @@
+import { createSlice } from '@reduxjs/toolkit';
+
+const masterSlice = createSlice({
+    name: "master",
+    initialState: {
+        masterSeceret: null
+    }, 
+    reducers: {
+        addSecerets: (state,action)=> {
+            state.masterSeceret = action.payload.secrets
+        },
+        removeSecrets: (state) => {
+            state.masterSeceret = null
+        }
+    }
+})
+
+
+const masterReducer = masterSlice.reducer;
+export default masterReducer;
+export const  {addSecerets, removeSecrets} = masterSlice.actions

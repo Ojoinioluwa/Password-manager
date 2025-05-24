@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
     },
     lockUntil: {
         type: Date,
+    },
+    salt: {
+        type: String,
+        required: true
     }
 },
 {

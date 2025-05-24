@@ -10,7 +10,7 @@ import { LoginAPI } from "../../services/user/userServices";
 import { useDispatch } from "react-redux";
 import { loginAction } from "../../redux/slice/authSlice";
 import type { Login, LoginResponse } from "../../types/userType";
-import { InputField } from "../../ui/auth/InputUI";
+import { InputField } from "../../ui/InputUI";
 import { ButtonUI } from "../../ui/ButtonUI";
 
 const validationSchema = Yup.object({

@@ -6,3 +6,11 @@ export type Password = {
     encryptedPassword: string;
     iv: string;
 }
+
+export type PasswordFormValues  =  {
+    password: string
+    url: string;
+    title: string;
+    email: string;
+    notes: string;
+}
