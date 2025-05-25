@@ -6,7 +6,7 @@ const validator = require("validator")
 
 const passwordController = {
     addPassword: asyncHandler(async (req, res) => {
-        const { title, email, url, notes, encryptedPassword, iv } = req.body
+        const { title, email, url, notes, encryptedPassword, iv, category } = req.body
         if (!title || !url || !encryptedPassword || !iv) {
             res.status(400)
             throw new Error("Fill in all required fields")
@@ -29,6 +29,7 @@ const passwordController = {
             email,
             iv,
             userId: req.user.id,
+            category: category.toUpperCase()
         })
 
         res.status(200).json({
