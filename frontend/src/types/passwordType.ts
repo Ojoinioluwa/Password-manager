@@ -4,7 +4,9 @@ export type Password = {
     email: string;
     notes: string;
     encryptedPassword: string;
-    iv: string;
+    iv?: string;
+    logo?: string
+    category: string;
 }
 
 export type PasswordFormValues  =  {
