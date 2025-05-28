@@ -39,7 +39,7 @@ function AboutPassword({
   };
 
   return (
-    <div className="px-5 py-2 border border-gray-400 w-full h-full">
+    <div className="px-5 py-2 border border-gray-300 w-full h-full">
       <div className=" flex gap-2 justify-end py-2">
         <Button
           size="small"

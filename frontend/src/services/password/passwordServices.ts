@@ -22,3 +22,46 @@ export const AddPasswordAPI = async ({ url, email, encryptedPassword, iv, notes,
         throw error
     }
 }
+
+
+
+
+
+
+
+
+
+// ===================================Check breach==========================
+
+export const CheckEMailBreachAPI = async ({ email }: { email: string }) => {
+    try {
+        const user = await getUserFromStorage()
+        const token = user?.token
+        const response = await axios.post(`${BASE_URL}/vault/checkEmailBreach`, { email }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        return response.data
+    } catch (error) {
+        catchAxiosError(error, "CheckEMailBreachAPI")
+        throw error
+    }
+}
+export const CheckCompanyBreach = async ({ company }: { company: string }) => {
+    try {
+        const user = await getUserFromStorage()
+        const token = user?.token
+        const response = await axios.post(`${BASE_URL}/vault/checkCompanyBreach`, { company }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        return response.data
+    } catch (error) {
+        catchAxiosError(error, "CheckCompanyBreach")
+        throw error
+    }
+}
+
+// ==========================================================================

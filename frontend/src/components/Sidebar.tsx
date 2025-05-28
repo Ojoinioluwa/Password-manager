@@ -33,11 +33,11 @@ export default function TemporaryDrawer() {
   };
 
   const sideBar = [
-    { name: "groups", icon: <GroupIcon /> },
-    { name: "vault", icon: <LockIcon /> },
-    { name: "authorized", icon: <VerifiedUserIcon /> },
-    { name: "test", icon: <AssessmentIcon /> },
-    { name: "generate", icon: <AutoAwesomeIcon /> },
+    { name: "groups", link: "groups",icon: <GroupIcon /> },
+    { name: "vault", link: "vault", icon: <LockIcon /> },
+    { name: "authorized", link: "authorized", icon: <VerifiedUserIcon /> },
+    // { name: "test", icon: <AssessmentIcon /> },
+    { name: "Generate & Test Passwords", link: "test", icon: <AutoAwesomeIcon /> },
   ];
 
   const DrawerList = (
@@ -45,7 +45,7 @@ export default function TemporaryDrawer() {
       <List>
         {sideBar.map((value) => (
           <ListItem key={value.name} disablePadding>
-            <ListItemButton onClick={() => handleChange(value.name)}>
+            <ListItemButton onClick={() => handleChange(value.link)}>
               <ListItemIcon>{value.icon}</ListItemIcon>
               <ListItemText primary={value.name.charAt(0).toUpperCase() + value.name.slice(1)} />
             </ListItemButton>

@@ -5,7 +5,7 @@ import { FaBell } from 'react-icons/fa';
 
 function NavBar() {
   return (
-    <div className="w-full h-20 flex items-center justify-between px-4">
+    <div className="w-full h-20 flex items-center justify-between px-4 bg-white fixed z-50">
         <TemporaryDrawer />
         <div className="flex gap-2">
             <IconButton>

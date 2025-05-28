@@ -36,7 +36,7 @@ const passwordSchema = new mongoose.Schema({
         required: true
     },
     category: {
-        type: string,
+        type: String,
         required: true,
         enum: 
         [

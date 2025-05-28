@@ -5,7 +5,8 @@ const errorhandler = require("./middlewares/errorHandler");
 const userRouter = require("./routes/user/userRouter");
 const limiter = require("./middlewares/rateLimiter");
 const helmet = require('helmet');
-const cors = require("cors")
+const cors = require("cors");
+const passwordRouter = require("./routes/password/passwordRoute");
 
 const app = express();
 const PORT = process.env.PORT || 8000
@@ -37,6 +38,7 @@ app.use(helmet());
 
 // consume the routes
 app.use("/api/v1", userRouter)
+app.use("/api/v1", passwordRouter)
 
 
 
