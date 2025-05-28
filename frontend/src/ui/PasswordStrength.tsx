@@ -17,7 +17,7 @@ const PasswordStrengthChecker = ({defaultPassword}: {defaultPassword?:string}) =
 
 
   return (
-    <div className="w-full mx-auto p-6 rounded-lg shadow-xl bg-white space-y-4">
+    <div className="w-full mx-auto p-6 rounded-lg bg-white space-y-4">
       <h2 className="text-2xl font-bold">🔐 Password Strength Checker</h2>
 
       <input

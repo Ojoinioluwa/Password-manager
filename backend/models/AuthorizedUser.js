@@ -1,0 +1,34 @@
+const mongoose = require("mongoose");
+
+const authorizedShema = new mongoose.Schema({
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
+    authorizedId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
+    encryptedPassword: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Password",
+        required: true
+    },
+    expiresAt: {
+        type: Date,
+    },
+    iv: {
+        type: String,
+        required: true
+    },
+    authorized: {
+        type: Boolean,
+        required: true,
+        default: true
+    }
+}, {timestamps: true});
+
+
+module.exports = mongoose.model("AuthorizedUser", authorizedShema)

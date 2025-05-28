@@ -1,4 +1,4 @@
-import { IconButton } from "@mui/material";
+import { Avatar, IconButton } from "@mui/material";
 import SouthIcon from "@mui/icons-material/South";
 import NorthIcon from "@mui/icons-material/North";
 import type { Password } from "../types/passwordType";
@@ -11,7 +11,7 @@ type ListUiProps = {
 
 export const ListUI = ({ setSelected, selected, data }: ListUiProps) => {
   return (
-    <>
+    <div className="flex flex-col items-start">
       {data.map((password: Password) => (
         <div
           key={password.logo}
@@ -26,11 +26,7 @@ export const ListUI = ({ setSelected, selected, data }: ListUiProps) => {
             }`}
           >
             <div className="flex gap-3 items-center">
-              <img
-                src={password.logo}
-                alt="logo"
-                className="rounded-full h-8 w-8"
-              />
+              <Avatar src={password.logo} />
               <p className="text-sm font-medium inline">{password.title}</p>
               <p className="text-xs font-light inline">- {password.title}</p>
             </div>
@@ -40,6 +36,6 @@ export const ListUI = ({ setSelected, selected, data }: ListUiProps) => {
           </div>
         </div>
       ))}
-    </>
+    </div>
   );
 };

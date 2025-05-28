@@ -4,6 +4,7 @@ import { ListUI } from "../../ui/ListUI";
 import { Button, TextField } from "@mui/material";
 import AboutPassword from "./AboutPassword";
 import PasswordStrengthChecker from "../../ui/PasswordStrength";
+import { useNavigate } from "react-router-dom";
 
 function ListPassowrds() {
   const mockPasswords: Password[] = [
@@ -101,15 +102,22 @@ function ListPassowrds() {
 
   const [selected, setSelected] = useState<string | undefined | null>(null);
   const [currentData, setCurrentData] = useState<Password>(mockPasswords[0]);
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [type, setType] = useState("");
+  const [category, setCategory] = useState("");
+  const navigate = useNavigate()
 
   const mack = useMemo(() => {
-    return mockPasswords.filter((password) =>
-      password.title.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [search]);
+    return mockPasswords.filter((password) => {
+      const matchesSearch = password.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchesCategory =
+        category === "" ||
+        password.category.toLowerCase() === category.toLowerCase();
+      return matchesSearch && matchesCategory;
+    });
+  }, [search, category]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e);
@@ -145,6 +153,7 @@ function ListPassowrds() {
                 size="medium"
                 className="font-bold"
                 type="button"
+                onClick={()=> navigate("/AddPassword")}
               >
                 +ADD
               </Button>
@@ -152,21 +161,22 @@ function ListPassowrds() {
             <select
               name="category"
               id="category"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
               className="border border-gray-300 px-2 py-2.5 focus:border-blue-700 focus:border-2 rounded-lg"
             >
-              <option value="SOCIAL">Social</option>
-              <option value="BANKING">Banking</option>
-              <option value="EMAIL">Email</option>
-              <option value="WORK">Work</option>
-              <option value="ENTERTAINMENT">Entertainment</option>
-              <option value="UTILITIES">Utilities</option>
-              <option value="SHOPPING">Shopping</option>
-              <option value="OTHERS">Others</option>
+              <option value="">All Categories</option>
+              <option value="Social">Social</option>
+              <option value="Banking">Banking</option>
+              <option value="Email">Email</option>
+              <option value="Work">Work</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Utilities">Utilities</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Others">Others</option>{" "}
             </select>
           </div>
-          <div className=" w-full overflow-y-scroll hide-scrollbar">
+          <div className=" w-full h-fit overflow-y-scroll hide-scrollbar">
             <ListUI data={mack} selected={selected} setSelected={setSelected} />
           </div>
         </div>
@@ -182,7 +192,7 @@ function ListPassowrds() {
           />
         </div>
       </div>
-      <div className="h-fit bg-gray-50 pb-10">
+      <div className="h-fit bg-gray-50 pb-10 px-4">
         <PasswordStrengthChecker defaultPassword={currentData?.email} />
       </div>
     </>
