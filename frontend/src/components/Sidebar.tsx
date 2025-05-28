@@ -36,7 +36,7 @@ export default function TemporaryDrawer() {
     { name: "groups", link: "groups",icon: <GroupIcon /> },
     { name: "vault", link: "vault", icon: <LockIcon /> },
     { name: "authorized", link: "authorized", icon: <VerifiedUserIcon /> },
-    // { name: "test", icon: <AssessmentIcon /> },
+    { name: "Authorized passwords", link: "authorizedPasswords", icon: <AssessmentIcon /> },
     { name: "Generate & Test Passwords", link: "test", icon: <AutoAwesomeIcon /> },
   ];
 
@@ -65,8 +65,8 @@ export default function TemporaryDrawer() {
           <IoLogoPlaystation
             style={{ fontSize: "28px", color: "#172554", marginRight: "10px" }}
           />
-          <Typography variant="h6" component="h1" sx={{ color: "#172554" }}>
-            Sequence
+          <Typography variant="h6" component="h1" sx={{ color: "#172554", fontSize: "30px" }}>
+            Vaulter
           </Typography>
         </Box>
         {DrawerList}

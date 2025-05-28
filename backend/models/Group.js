@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
 const groupSchema = new mongoose.Schema({
-    ownerId:{
+    name: {
+        type: String,
+        required: true,
+    },
+    ownerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
@@ -11,11 +15,42 @@ const groupSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    members: [{userId: {type: mongoose.Schema.Types.ObjectId, ref: "User"}}],
+    members: [
+        {
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+            authorized: { type: Boolean, required: true, default: true }
+        }
+    ],
     iv: {
-        type: string,
+        type: String,
     },
     expiresAt: {
         type: Date
-    }
-}, {timestamps: true})
+    },
+    type: {
+        type: String,
+        enum: [
+            "family",
+            "friends",
+            "school",
+            "coworkers",
+            "community",
+            "gaming",
+            "study",
+            "project",
+            "support",
+            "others"
+        ],
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    // image: {
+    //     type: String,
+    //     required: true
+    // }
+}, { timestamps: true });
+
+module.exports = mongoose.model("Group", groupSchema);
