@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const asyncHandler = require("express-async-handler");
 const { createSalt } = require("../utils/genSalt");
 const Group = require("../models/Group");
+const User = require("../models/User");
 
 
 const groupController = {
@@ -21,7 +22,8 @@ const groupController = {
             salt: groupSalt,
             expiresAt,
             type,
-            ownerId: req.user.id
+            ownerId: req.user.id,
+            members: [{ userId: req.user.id, authorized: true }]
         });
 
 
@@ -47,10 +49,10 @@ const groupController = {
             throw new Error("Group does not exist")
         }
 
-        if (description) group.description = description;
-        if (name) group.name = name;
-        if (expiresAt) group.expiresAt = expiresAt
-        if (type) group.type = type;
+        if (description !== undefined) group.description = description;
+        if (name !== undefined) group.name = name;
+        if (expiresAt !== undefined) group.expiresAt = expiresAt
+        if (type !== undefined) group.type = type;
 
         await group.save();
         res.status(200).json({
@@ -79,8 +81,136 @@ const groupController = {
         })
 
     }),
-    getAuthorizedPassword: asyncHandler(async (req, res) => { }),
-    getGroupMembers: asyncHandler(async (req, res) => { }),
+
+    getgroups: asyncHandler(async (req, res) => {
+        const groups = await Group.find({
+            members: {
+                $elemMatch: {
+                    userId: req.user.id,
+                    authorized: true
+                }
+            }
+        }).populate("members.userId", "firstName email lastName").lean()
+
+        res.status(200).json({
+            message: "fetched groups successfully",
+            groups
+        })
+    }),
+    addMember: asyncHandler(async (req, res) => {
+        const { email } = req.body;
+        const { groupId } = req.params;
+
+        const group = await Group.findOne({ ownerId: req.user.id, _id: groupId });
+
+        if (!group) {
+            res.status(404)
+            throw new Error("Group does not exist or not authorized to add members")
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            res.status(404)
+            throw new Error("User does not exist")
+        }
+
+        const alreadyMember = group.members.some(m => m.userId.toString() === user._id.toString());
+        if (alreadyMember) {
+            res.status(400);
+            throw new Error("User is already a member of the group");
+        }
+
+
+        group.members.push({ userId: user._id })
+
+        await group.save();
+
+        res.status(200).json({
+            message: "User added to the group successfully"
+        })
+    }),
+    removeMember: asyncHandler(async (req, res) => {
+        const { groupId, userId } = req.params;
+
+        const group = await Group.findOne({ _id: groupId, ownerId: req.user.id });
+
+        if (!group) {
+            res.status(404)
+            throw new Error("Group does not exist or user does not have authority to modify the group")
+        }
+
+
+        const isMember = group.members.some(
+            m => m.userId.toString() === userId
+        );
+        if (!isMember) {
+            res.status(400);
+            throw new Error("That user is not a member of this group");
+        }
+
+        group.members = group.members.filter(
+            m => m.userId.toString() !== userId
+        );
+        await group.save();
+
+        res.status(200).json({ message: "User removed from group successfully" });
+
+
+    }),
+
+    leaveGroup: asyncHandler(async (req, res) => {
+        const { groupId } = req.params;
+
+        const group = await Group.findOne({
+            _id: groupId,
+            members: {
+                $elemMatch: {
+                    userId: req.user.id
+                }
+            }
+        });
+
+        if (!group) {
+            res.status(404);
+            throw new Error("Group not found or user is not a member");
+        }
+
+        group.members = group.members.filter(
+            (member) => member.userId.toString() !== req.user.id.toString()
+        );
+        await group.save();
+
+        res.status(200).json({ message: "You have left the group successfully" });
+    }),
+
+    authorizeGroup: asyncHandler(async(req, res)=> {
+        const {encryptedPassword, iv} = req.body;
+        const {groupId} = req.params
+
+        const group = await Group.findOne({_id: groupId, ownerId: req.user.id});
+
+        if(!group){
+            res.status(404);
+            throw new Error("Group does not exist or user is not authorized");
+        }
+
+        if(encryptedPassword !== undefined) group.encryptedPassword = encryptedPassword;
+        if(iv !== undefined) group.iv = iv;
+
+
+        res.status(200).json({
+            message: "group authorized successfully"
+        })
+
+
+
+    }),
+    unAuthorizeGroup: asyncHandler(async(req, res)=> {}),
+
+
+
+
+
 }
 
 module.exports = groupController;

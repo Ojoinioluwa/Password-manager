@@ -7,7 +7,8 @@ const authorizedUserController = {
 
     // add
     addAuthorizedUser: asyncHandler(async (req, res) => {
-        const { expiresAt, encryptedPassword, iv, authorizedId } = req.body
+        const { expiresAt, encryptedPassword, iv,  } = req.body
+        const {authorizedId} = req.params;
         if (!iv || !encryptedPassword) {
             return res.status(400).json({
                 message: "Please ensure you encrypt the password"
@@ -43,7 +44,6 @@ const authorizedUserController = {
         })
     }),
 
-
     // delete
     deleteAuthorizedUser: asyncHandler(async (req, res) => {
         const { authorizedId } = req.params
@@ -64,7 +64,6 @@ const authorizedUserController = {
             deletedAuthorizedUser
         })
     }),
-
     // edit
     editAuthorizedUser: asyncHandler(async (req, res) => {
         const { authorizedId } = req.params

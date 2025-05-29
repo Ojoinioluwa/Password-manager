@@ -47,6 +47,14 @@ const groupSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    encryptedPassword: {
+        type: String,
+    },
+    authorized: {
+        type: Boolean,
+        required: true,
+        default: true
+    }
     // image: {
     //     type: String,
     //     required: true
