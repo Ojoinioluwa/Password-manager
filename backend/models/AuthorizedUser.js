@@ -27,6 +27,11 @@ const authorizedShema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: true
+    },
+    passwordId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Password",
+        required: true
     }
 }, {timestamps: true});
 

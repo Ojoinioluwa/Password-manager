@@ -81,15 +81,15 @@ const groupController = {
         })
 
     }),
-
-    getgroups: asyncHandler(async (req, res) => {
+    getgroupsUser: asyncHandler(async (req, res) => {
         const groups = await Group.find({
             members: {
                 $elemMatch: {
                     userId: req.user.id,
                     authorized: true
                 }
-            }
+            },
+            authorized: true
         }).populate("members.userId", "firstName email lastName").lean()
 
         res.status(200).json({
@@ -183,19 +183,21 @@ const groupController = {
         res.status(200).json({ message: "You have left the group successfully" });
     }),
 
-    authorizeGroup: asyncHandler(async(req, res)=> {
-        const {encryptedPassword, iv} = req.body;
-        const {groupId} = req.params
+    authorizeGroup: asyncHandler(async (req, res) => {
+        const { encryptedPassword, iv } = req.body;
+        const { groupId } = req.params
 
-        const group = await Group.findOne({_id: groupId, ownerId: req.user.id});
+        const group = await Group.findOne({ _id: groupId, ownerId: req.user.id });
 
-        if(!group){
+        if (!group) {
             res.status(404);
             throw new Error("Group does not exist or user is not authorized");
         }
 
-        if(encryptedPassword !== undefined) group.encryptedPassword = encryptedPassword;
-        if(iv !== undefined) group.iv = iv;
+        if (encryptedPassword !== undefined) group.encryptedPassword = encryptedPassword;
+        if (iv !== undefined) group.iv = iv;
+
+        await group.save()
 
 
         res.status(200).json({
@@ -205,7 +207,23 @@ const groupController = {
 
 
     }),
-    unAuthorizeGroup: asyncHandler(async(req, res)=> {}),
+    toggleAuthorizeGroup: asyncHandler(async (req, res) => {
+        const { groupId } = req.params;
+        const group = await Group.findOne({ _id: groupId, ownerId: req.user.id });
+
+        if (!group) {
+            res.status(404);
+            throw new Error("Group does not exist or user is not authorized");
+        }
+
+        group.authorized = !group.authorized;
+
+        await group.save()
+
+        res.status(200).json({
+            message: "successfully toggled group authorization"
+        })
+    }),
 
 
 

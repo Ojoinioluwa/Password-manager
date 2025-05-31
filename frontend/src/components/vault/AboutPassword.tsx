@@ -5,6 +5,8 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useState } from "react";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import { useNavigate } from "react-router-dom";
 
 type About = {
   logo?: string;
@@ -27,6 +29,7 @@ function AboutPassword({
 }: About) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate()
 
   const handleCopy = async () => {
     try {
@@ -48,6 +51,15 @@ function AboutPassword({
           startIcon={<DeleteIcon />}
         >
           Delete
+        </Button>
+        <Button
+          size="small"
+          variant="contained"
+          type="button"
+          startIcon={<VpnKeyIcon />}
+          // onClick={()=> navigate(`authorize/${passwordId}`)}
+        >
+          Authorize
         </Button>
         <Button
           size="small"

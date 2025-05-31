@@ -1,14 +1,20 @@
 const asyncHandler = require("express-async-handler");
 const mongoose = require("mongoose");
 const AuthorizedUser = require("../models/AuthorizedUser");
+const User = require("../models/User");
 
 
 const authorizedUserController = {
 
     // add
     addAuthorizedUser: asyncHandler(async (req, res) => {
-        const { expiresAt, encryptedPassword, iv,  } = req.body
-        const {authorizedId} = req.params;
+        const { expiresAt, encryptedPassword, iv,  email, passwordId} = req.body
+        const user = await User.findOne({email}).select("_id");
+        if(!user){
+            res.status(404)
+            throw new Error("User does not exist. Can not authorize user that is not a participant of this site")
+        }
+
         if (!iv || !encryptedPassword) {
             return res.status(400).json({
                 message: "Please ensure you encrypt the password"
@@ -21,11 +27,12 @@ const authorizedUserController = {
         }
 
         const authorizedUser = await AuthorizedUser.create({
-            authorizedId,
+            authorizedId: user._id,
             expiresAt,
             encryptedPassword,
             iv,
             ownerId: req.user.id,
+            passwordId
 
         })
 

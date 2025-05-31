@@ -12,6 +12,9 @@ import PasswordStrengthChecker from "./ui/PasswordStrength";
 import EmailPwnedChecker from "./ui/emailPwnedChecker";
 import GeneratePassword from "./components/vault/GeneratePassword";
 import Test from "./components/vault/Test";
+import ListAuthorizedUsers from "./components/vault/authorize/ListAuthorized";
+import AuthorizeUser from "./components/vault/authorize/AuthorizeUser";
+import AddGroup from "./components/groups/AddGroup";
 
 function App() {
   return (
@@ -26,10 +29,13 @@ function App() {
           <Route index element={<ListPassowrds />} />
           <Route path="vault" element={<ListPassowrds />} />
           <Route path="test" element={<Test />} />
+          <Route path="authorized" element={<ListAuthorizedUsers />} />
         </Route>
         <Route path="/strength" element={<PasswordStrengthChecker />} />
         <Route path="/email" element={<EmailPwnedChecker />} />
         <Route path="/gen" element={<GeneratePassword />} />
+        <Route path="/authUser" element={<AuthorizeUser />} />
+        <Route path="/addGroup" element={<AddGroup />} />
       </Routes>
     </BrowserRouter>
   );

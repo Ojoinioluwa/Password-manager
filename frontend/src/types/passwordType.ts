@@ -15,4 +15,5 @@ export type PasswordFormValues  =  {
     title: string;
     email: string;
     notes: string;
+    category: string
 }
