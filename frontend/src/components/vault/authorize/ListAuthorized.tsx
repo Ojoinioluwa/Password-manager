@@ -15,8 +15,6 @@ import { useMemo, useState } from "react";
 // import Loading from "../../State/Loading";
 
 function ListAuthorizedUsers() {
-
-
   // const {
   //   data: studentResponse,
   //   isLoading,
@@ -26,11 +24,9 @@ function ListAuthorizedUsers() {
   //   // enabled: !!filters.department,
   // });
 
-
-
   // if (isLoading || deptLoading) return <Loading />;
 
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("");
 
   const authorizedUsers = [
     {
@@ -226,13 +222,13 @@ function ListAuthorizedUsers() {
     // ... Add up to 30+ entries by duplicating or varying users/passwords
   ];
 
-  const users = useMemo(()=>{
-   return authorizedUsers.filter(user =>
-  user.firstName.toLowerCase().includes(search.toLowerCase()) ||
-  user.email.toLowerCase().includes(search.toLowerCase())
-)
-
-  }, [search])
+  const users = useMemo(() => {
+    return authorizedUsers.filter(
+      (user) =>
+        user.firstName.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [search]);
 
   return (
     <div className="min-h-screen h-[100vh] bg-transparent m-3 rounded-xl p-4 flex flex-col gap-6">
@@ -245,7 +241,7 @@ function ListAuthorizedUsers() {
           <input
             type="search"
             value={search}
-            onChange={(e)=> setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name or ID"
             className="border border-gray-300 rounded-full px-3 py-1.5 text-sm w-52"
           />
@@ -273,7 +269,6 @@ function ListAuthorizedUsers() {
                   index % 2 === 0 ? "bg-white" : "bg-gray-50"
                 }`}
               >
-                
                 <td className="px-4 py-3">{user.firstName}</td>
                 <td className="px-4 py-3">{user.email}</td>
                 <td className="px-4 py-3 text-gray-500 font-mono">
@@ -285,7 +280,7 @@ function ListAuthorizedUsers() {
                       className="text-green-600 cursor-pointer"
                       fontSize="small"
                       titleAccess="Click to unauthorize"
-                      onClick={() => console.log("togggled")}
+                      onClick={() => console.log("toggled")}
                     />
                   ) : (
                     <CancelOutlinedIcon
@@ -296,7 +291,11 @@ function ListAuthorizedUsers() {
                     />
                   )}
                 </td>
-                <td className="px-4 py-3">{user.expiresAt ? user.expiresAt?.toString().split("T")[0] : "NIL"}</td>
+                <td className="px-4 py-3">
+                  {user.expiresAt
+                    ? user.expiresAt?.toString().split("T")[0]
+                    : "NIL"}
+                </td>
                 <td className="px-4 py-3 flex gap-5">
                   <DeleteOutlineIcon
                     className="text-gray-600 hover:text-red-600 cursor-pointer"

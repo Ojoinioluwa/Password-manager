@@ -1,10 +1,12 @@
 import { Button, Divider, TextField } from "@mui/material";
 import type { Password } from "../../types/passwordType";
-import { ListUI } from "../../ui/ListUI";
 import { useEffect, useMemo, useState } from "react";
 import GroupCard from "../../ui/GroupCard";
 import { useNavigate } from "react-router-dom";
 import ListAuthorizedUsers from "../vault/authorize/ListAuthorized";
+import { Avatar, IconButton } from "@mui/material";
+import SouthIcon from "@mui/icons-material/South";
+import NorthIcon from "@mui/icons-material/North";
 
 function AboutGroups() {
   const mockPasswords: Password[] = [
@@ -102,7 +104,6 @@ function AboutGroups() {
 
   const [selected, setSelected] = useState<string | undefined | null>(null);
   const [currentData, setCurrentData] = useState<Password>(mockPasswords[0]);
-  // const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
@@ -142,7 +143,7 @@ function AboutGroups() {
 
   return (
     <div className="flex justify-center items-center p-5">
-      <div className="bg-gray-100 p-4 flex flex-col w-full md:w-[80vw] lg:w-[60vw] rounded-lg shadow">
+      <div className="bg-gray-200 p-4 flex flex-col w-full md:w-[80vw] lg:w-[60vw] rounded-lg shadow">
         <div className="flex justify-between items-center p-3">
           <h4 className="font-bold text-2xl text-blue-950">About Group</h4>
           <div>
@@ -184,7 +185,42 @@ function AboutGroups() {
             </div>
           </div>
           <div className="w-full h-full overflow-y-scroll hide-scrollbar">
-            <ListUI data={mack} selected={selected} setSelected={setSelected} />
+            <div className="flex flex-col items-start">
+              {mack.map((password: Password) => (
+                <div
+                  key={password.logo}
+                  className="flex flex-col w-full py-0.5 h-fit px-1 cursor-pointer"
+                >
+                  <div
+                    onClick={() =>
+                      setSelected(
+                        selected === password.logo ? null : password.logo
+                      )
+                    }
+                    className={`flex shadow-md justify-between w-full rounded-lg border  border-gray-300 py-2 px-3 items-center h-[70px] ${
+                      selected === password.logo ? "bg-gray-500" : "bg-white"
+                    }`}
+                  >
+                    <div className="flex gap-3 items-center">
+                      <Avatar src={password.logo} />
+                      <p className="text-sm font-medium inline">
+                        {password.title}
+                      </p>
+                      <p className="text-xs font-light inline">
+                        - {password.title}
+                      </p>
+                    </div>
+                    <IconButton aria-label="delete">
+                      {selected === password.logo ? (
+                        <NorthIcon />
+                      ) : (
+                        <SouthIcon />
+                      )}
+                    </IconButton>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <Divider />

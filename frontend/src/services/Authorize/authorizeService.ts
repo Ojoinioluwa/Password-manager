@@ -1,28 +1,114 @@
 import axios from "axios";
-import { BASE_URL } from "../../utils/url";
-import type { AddAuthorizeUser } from "../../types/authorseType";
-import  catchAxiosError from "../../utils/catchAxiosError";
 import { getUserFromStorage } from "../../utils/getUserFromStorage";
+import { BASE_URL } from "../../utils/url";
+import catchAxiosError from "../../utils/catchAxiosError";
 
-
-export const AddAuthorizeUserAPI = async({encryptedPassword, email, iv, expiresAt, passwordId}: AddAuthorizeUser)=>{
+export const AddAuthorizedUserAPI = async ({
+    passwordId,
+    email,
+    encryptedPassword,
+    iv,
+    expiresAt,
+}: {
+    passwordId: string;
+    email: string;
+    encryptedPassword: string;
+    iv: string;
+    expiresAt?: string;
+}) => {
     try {
-        const user = getUserFromStorage();
-        const token = user?.token
-        const response = await axios.post(`${BASE_URL}/`, {
-            encryptedPassword, 
-            email, 
-            iv, 
-            expiresAt, 
-            passwordId
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        const user = await getUserFromStorage();
+        const token = user?.token;
+        const response = await axios.post(
+            `${BASE_URL}/authorize/user/${passwordId}`,
+            { email, encryptedPassword, iv, expiresAt },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             }
-        })
-        return response.data
+        );
+        return response.data;
     } catch (error) {
-        catchAxiosError(error, "AddAuthorizeUserAPI");
-        throw error
+        catchAxiosError(error, "AddAuthorizedUserAPI");
+        throw error;
     }
-}
+};
+
+export const GetAuthorizedUsersAPI = async () => {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token;
+        const response = await axios.get(`${BASE_URL}/authorize/user`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        catchAxiosError(error, "GetAuthorizedUsersAPI");
+        throw error;
+    }
+};
+
+export const DeleteAuthorizedUserAPI = async ({ authorizedId }: { authorizedId: string }) => {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token;
+        const response = await axios.delete(`${BASE_URL}/authorize/user/${authorizedId}/delete`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        catchAxiosError(error, "DeleteAuthorizedUserAPI");
+        throw error;
+    }
+};
+
+export const EditAuthorizedUserAPI = async ({
+    authorizedId,
+    expiresAt,
+}: {
+    authorizedId: string;
+    expiresAt?: string;
+}) => {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token;
+        const response = await axios.put(
+            `${BASE_URL}/authorize/user/${authorizedId}/edit`,
+            { expiresAt },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        catchAxiosError(error, "EditAuthorizedUserAPI");
+        throw error;
+    }
+};
+
+export const ToggleAuthorizedUserAPI = async ({ authorizedId }: { authorizedId: string }) => {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token;
+        const response = await axios.put(
+            `${BASE_URL}/authorize/user/${authorizedId}/toggleAuthorize`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        catchAxiosError(error, "ToggleAuthorizedUserAPI");
+        throw error;
+    }
+};

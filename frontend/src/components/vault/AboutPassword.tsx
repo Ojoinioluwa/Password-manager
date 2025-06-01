@@ -3,12 +3,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useState } from "react";
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { useNavigate } from "react-router-dom";
 
 type About = {
+  _id: string;
   logo?: string;
   title?: string;
   category?: string;
@@ -19,17 +20,18 @@ type About = {
 };
 
 function AboutPassword({
+  _id,
   logo,
   title,
   category,
   email,
   url,
   encryptedPassword,
-  notes
+  notes,
 }: About) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleCopy = async () => {
     try {
@@ -66,6 +68,7 @@ function AboutPassword({
           variant="contained"
           type="button"
           startIcon={<EditIcon />}
+          onClick={() => navigate(`editPassword/${_id}`)}
         >
           Edit
         </Button>
@@ -107,12 +110,13 @@ function AboutPassword({
             <p className="truncate">{encryptedPassword}</p>
             <div className="flex">
               <button
-                onClick={()=> setVisible(!visible)}
+                onClick={() => setVisible(!visible)}
                 className="ml-2 text-blue-900 hover:text-blue-950"
               >
-                {visible === true ? <VisibilityIcon/> : <VisibilityOffIcon/>}
+                {visible === true ? <VisibilityIcon /> : <VisibilityOffIcon />}
               </button>
               <button
+                title="copy"
                 onClick={handleCopy}
                 className="ml-2 text-blue-900 hover:text-blue-950"
               >
@@ -131,7 +135,7 @@ function AboutPassword({
           <p className="text-xl font-semibold text-blue-900">Notes</p>
           <p className="text-sm font-light">{notes}</p>
         </div>
-        <Divider/>
+        <Divider />
       </div>
     </div>
   );

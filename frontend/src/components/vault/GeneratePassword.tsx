@@ -1,25 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const charset = {
-  lowercase: 'abcdefghijklmnopqrstuvwxyz',
-  uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-  numbers: '0123456789',
-  symbols: '!@#$%^&*()_+[]{}|;:,.<>?',
+  lowercase: "abcdefghijklmnopqrstuvwxyz",
+  uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  numbers: "0123456789",
+  symbols: "!@#$%^&*()_+[]{}|;:,.<>?",
 };
 
-function generatePassword(length: number, useUppercase: boolean, useLowercase: boolean, useNumbers: boolean, useSymbols: boolean): string {
-  let allowedChars = '';
+function generatePassword(
+  length: number,
+  useUppercase: boolean,
+  useLowercase: boolean,
+  useNumbers: boolean,
+  useSymbols: boolean
+): string {
+  let allowedChars = "";
   if (useLowercase) allowedChars += charset.lowercase;
   if (useUppercase) allowedChars += charset.uppercase;
   if (useNumbers) allowedChars += charset.numbers;
   if (useSymbols) allowedChars += charset.symbols;
 
-  if (!allowedChars) return '';
+  if (!allowedChars) return "";
 
   const array = new Uint32Array(length);
   window.crypto.getRandomValues(array);
 
-  return Array.from(array, (x) => allowedChars[x % allowedChars.length]).join('');
+  return Array.from(array, (x) => allowedChars[x % allowedChars.length]).join(
+    ""
+  );
 }
 
 const GeneratePassword: React.FC = () => {
@@ -28,10 +36,16 @@ const GeneratePassword: React.FC = () => {
   const [includeLowercase, setIncludeLowercase] = useState(true);
   const [includeNumbers, setIncludeNumbers] = useState(true);
   const [includeSymbols, setIncludeSymbols] = useState(true);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
 
   const handleGenerate = () => {
-    const newPassword = generatePassword(length, includeUppercase, includeLowercase, includeNumbers, includeSymbols);
+    const newPassword = generatePassword(
+      length,
+      includeUppercase,
+      includeLowercase,
+      includeNumbers,
+      includeSymbols
+    );
     setPassword(newPassword);
   };
 
@@ -53,19 +67,35 @@ const GeneratePassword: React.FC = () => {
 
       <div className="flex flex-col gap-3">
         <label>
-          <input type="checkbox" checked={includeUppercase} onChange={(e) => setIncludeUppercase(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={includeUppercase}
+            onChange={(e) => setIncludeUppercase(e.target.checked)}
+          />
           <span className="ml-2">Include Uppercase</span>
         </label>
         <label>
-          <input type="checkbox" checked={includeLowercase} onChange={(e) => setIncludeLowercase(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={includeLowercase}
+            onChange={(e) => setIncludeLowercase(e.target.checked)}
+          />
           <span className="ml-2">Include Lowercase</span>
         </label>
         <label>
-          <input type="checkbox" checked={includeNumbers} onChange={(e) => setIncludeNumbers(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={includeNumbers}
+            onChange={(e) => setIncludeNumbers(e.target.checked)}
+          />
           <span className="ml-2">Include Numbers</span>
         </label>
         <label>
-          <input type="checkbox" checked={includeSymbols} onChange={(e) => setIncludeSymbols(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={includeSymbols}
+            onChange={(e) => setIncludeSymbols(e.target.checked)}
+          />
           <span className="ml-2">Include Symbols</span>
         </label>
       </div>

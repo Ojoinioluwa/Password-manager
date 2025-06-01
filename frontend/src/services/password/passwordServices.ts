@@ -24,19 +24,67 @@ export const AddPasswordAPI = async ({ url, email, encryptedPassword, iv, notes,
     }
 }
 
-export const EditPasswordAPI = async({encryptedPassword, iv}: {encryptedPassword: string, iv: string})=> {
+export const EditPasswordAPI = async ({ encryptedPassword, iv, passwordId }: { encryptedPassword: string, iv: string, passwordId: string }) => {
     try {
         const user = await getUserFromStorage();
         const token = user?.token;
-        const response = await axios.put(`${BASE_URL}/vault/editPassword`, {encryptedPassword, iv}, {
+        const response = await axios.put(`${BASE_URL}/vault/updatePassword/${passwordId}`, { encryptedPassword, iv }, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         })
         return response.data
     } catch (error) {
-     catchAxiosError(error, "EditPasswordAPI")  ;
-     throw error 
+        catchAxiosError(error, "EditPasswordAPI");
+        throw error
+    }
+}
+
+export const DeletePasswordAPI = async ({ passwordId }: { passwordId: string }) => {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token
+        const response = await axios.delete(`${BASE_URL}/vault/deletePassword/${passwordId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        return response.data
+    } catch (error) {
+        catchAxiosError(error, "DeletePasswordAPI")
+        throw error
+    }
+}
+export const GetPasswordByIdAPI = async ({ passwordId }: { passwordId: string }) => {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token
+        const response = await axios.get(`${BASE_URL}/vault/getPassword/${passwordId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        return response.data
+    } catch (error) {
+        catchAxiosError(error, "GetPasswordByIdAPI")
+        throw error
+    }
+}
+
+
+export const GetAllPasswordsAPI = async () => {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token
+        const response = await axios.get(`${BASE_URL}/vault/getAllPasswords`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        return response.data
+    } catch (error) {
+        catchAxiosError(error, "GetAllPasswordsAPI")
+        throw error
     }
 }
 

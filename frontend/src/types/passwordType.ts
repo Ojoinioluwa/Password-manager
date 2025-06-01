@@ -1,4 +1,5 @@
 export type Password = {
+    _id?: string;
     url: string;
     title: string;
     email: string;
@@ -9,7 +10,7 @@ export type Password = {
     category: string;
 }
 
-export type PasswordFormValues  =  {
+export type PasswordFormValues = {
     password: string
     url: string;
     title: string;

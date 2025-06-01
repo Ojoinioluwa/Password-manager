@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { Button } from "@mui/material";
 import DummyImage from "../assets/login.jpeg";
+import { useNavigate } from "react-router-dom";
 
 export const GroupCardUI = ({ group }) => {
   const {
@@ -10,6 +11,8 @@ export const GroupCardUI = ({ group }) => {
     // Optional future fields like imageUrl can go here
   } = group;
 
+  const navigate = useNavigate();
+  const groupId = 123;
   return (
     <div className="flex flex-col bg-white shadow hover:shadow-lg hover:scale-105 transition-transform w-[200px] h-[300px]">
       <div className="h-[200px] w-full overflow-hidden">
@@ -27,7 +30,11 @@ export const GroupCardUI = ({ group }) => {
           {type.charAt(0).toUpperCase() + type.slice(1)}
         </p>
         <p className="text-blue-950 text-xs line-clamp-2">{description}</p>
-        <Button variant="outlined" size="small">
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => navigate(`/dashboard/groups/${groupId}`)}
+        >
           View Group
         </Button>
       </div>

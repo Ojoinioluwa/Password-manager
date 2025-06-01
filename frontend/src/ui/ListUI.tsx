@@ -6,7 +6,7 @@ import type { Password } from "../types/passwordType";
 type ListUiProps = {
   selected: string | null | undefined;
   data: Password[];
-  setSelected: React.Dispatch<React.SetStateAction<string | null | undefined>>;
+  setSelected: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export const ListUI = ({ setSelected, selected, data }: ListUiProps) => {
@@ -14,15 +14,15 @@ export const ListUI = ({ setSelected, selected, data }: ListUiProps) => {
     <div className="flex flex-col items-start">
       {data.map((password: Password) => (
         <div
-          key={password.logo}
+          key={password._id}
           className="flex flex-col w-full py-0.5 h-fit px-1 cursor-pointer"
         >
           <div
             onClick={() =>
-              setSelected(selected === password.logo ? null : password.logo)
+              setSelected(selected === password._id! ? null : password._id!)
             }
-            className={`flex shadow-md justify-between w-full rounded-lg border  border-gray-300 py-2 px-3 items-center h-[70px] ${
-              selected === password.logo ? "bg-gray-500" : "bg-white"
+            className={`flex shadow-md justify-between w-full rounded-lg border border-gray-300 py-2 px-3 items-center h-[70px] ${
+              selected === password._id ? "bg-gray-500" : "bg-white"
             }`}
           >
             <div className="flex gap-3 items-center">
@@ -31,7 +31,7 @@ export const ListUI = ({ setSelected, selected, data }: ListUiProps) => {
               <p className="text-xs font-light inline">- {password.title}</p>
             </div>
             <IconButton aria-label="delete">
-              {selected === password.logo ? <NorthIcon /> : <SouthIcon />}
+              {selected === password._id ? <NorthIcon /> : <SouthIcon />}
             </IconButton>
           </div>
         </div>

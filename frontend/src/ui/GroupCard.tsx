@@ -26,7 +26,7 @@ export default function GroupCard({ group }) {
   });
 
   return (
-    <div className="w-full flex rounded-lg overflow-hidden">
+    <div className="w-full flex-col md:flex rounded-lg overflow-hidden">
       {/* Header: Avatar + Basic Info */}
       <div className="flex items-center p-4 border-b">
         <Avatar

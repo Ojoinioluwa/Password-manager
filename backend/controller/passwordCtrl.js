@@ -16,7 +16,7 @@ const passwordController = {
             throw new Error("Enter a valid url")
         }
 
-        if (!validator.isEmail(email)) {
+        if (email && !validator.isEmail(email)) {
             res.status(400)
             throw new Error("Enter a valid Email")
         }
@@ -29,7 +29,8 @@ const passwordController = {
             email,
             iv,
             userId: req.user.id,
-            category: category.toUpperCase()
+            category: category ? category.toUpperCase() : "OTHERS"
+
         })
 
         res.status(200).json({
@@ -53,7 +54,7 @@ const passwordController = {
     }),
     getPasswordById: asyncHandler(async (req, res) => {
         const { passwordId } = req.params
-        const password = await Password.findById(passwordId).lean();
+        const password = await Password.findOne({ _id: passwordId, userId: req.user.id }).lean();
         if (!password) {
             res.status(404)
             throw new Error("Password does not exist");
@@ -65,28 +66,15 @@ const passwordController = {
     }),
     updatePassword: asyncHandler(async (req, res) => {
         const { passwordId } = req.params;
-        const { title, email, url, notes, encryptedPassword, iv } = req.body
-        if (email && !validator.isEmail(email)) {
-            res.status(400)
-            throw new Error("Enter a valid Email")
-        }
-        if (url && !validator.isURL(url)) {
-            res.status(400)
-            throw new Error("Enter a valid url")
-        }
+        const { encryptedPassword, iv } = req.body
         const password = await Password.findOne({ _id: passwordId, userId: req.user.id })
         if (!password) {
             res.status(404)
             throw new Error("Password not found or you are not authorized to update it");
         }
 
-        if (title) password.title = title;
-        if (email) password.email = email;
-        if (url) password.url = url;
         if (encryptedPassword) password.encryptedPassword = encryptedPassword;
-        if (notes) password.notes = notes
         if (iv) password.iv = iv;
-
 
         await password.save();
 
@@ -103,7 +91,7 @@ const passwordController = {
             throw new Error("Password not found or you are not authorized to delete it")
         }
         res.status(200).json({
-            message: "user deleted Successfully"
+            message: "Password deleted Successfully"
         })
     }),
 }
