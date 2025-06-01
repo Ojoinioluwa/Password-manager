@@ -4,18 +4,17 @@ import * as Yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { AddAuthorizeUserAPI } from "../../services/Authorize/authorizeService"; 
 import { ButtonUI } from "../../ui/ButtonUI";
-import { useParams } from "react-router-dom";
+
 
 const validationSchema = Yup.object({
-  email: Yup.string()
-    .email()
-    .required("Email of the authorized user is required"),
+  name: Yup.string()
+    .required("Name of the group is required"),
   expiresAt: Yup.date().nullable(),
-  type: Yup.string().required("Group type is required")
+  type: Yup.string().required("Group type is required"),
+  description: Yup.string().required("Write a brief description about the group")
 });
 
 function AddGroup() {
-  const { passwordId } = useParams();
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["AuthorizeUser"],
     mutationFn: AddAuthorizeUserAPI,
@@ -23,17 +22,24 @@ function AddGroup() {
 
   const formik = useFormik({
     initialValues: {
-      email: "",
+      name: "",
       expiresAt: "",
       type: "",
     },
     validationSchema,
     onSubmit: async (values) => {
-      const data = await mutateAsync({
-        passwordId: passwordId,
-        email: values.email,
+
+      try {
+          const data = await mutateAsync({
+        name: values.name,
         expiresAt: values.expiresAt,
       });
+      alert("Group added successfully")
+      } catch (error) {
+        console.log(error)
+        alert(error)
+      }
+    
     },
   });
   return (
@@ -47,9 +53,9 @@ function AddGroup() {
         <InputField
           formik={formik}
           isPending={isPending}
-          type="email"
+          type="name"
           size="medium"
-          name="email"
+          name="name"
           label="Enter the name of the group"
         />
         <InputField
@@ -62,6 +68,7 @@ function AddGroup() {
           label=""
         />
         <select
+          title="category"
           name="category"
           id="category"
           value={formik.values.type}
@@ -80,6 +87,20 @@ function AddGroup() {
           <option value="support">Support</option>
           <option value="others">Others</option>
         </select>
+
+         <div>
+            <textarea
+              name="description"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className="border border-gray-400 w-full outline-blue-600 rounded-lg p-3"
+              placeholder="A brief talk about the account"
+            />
+            {formik.touched.description && formik.errors.description && (
+              <div className="text-red-500 text-sm">{formik.errors.description}</div>
+            )}
+          </div>
 
         <ButtonUI isPending={isPending} name="Authorize" />
       </form>

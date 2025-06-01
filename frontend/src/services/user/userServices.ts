@@ -15,18 +15,18 @@ export const LoginAPI = async ({ email, password }: Login): Promise<LoginRespons
     }
 }
 
-export const RegisterAPI = async({email, password, phoneNumber, firstName, lastName,}: User) => {
+export const RegisterAPI = async ({ email, password, phoneNumber, firstName, lastName, }: User) => {
     try {
-       const response = await axios.post(`${BASE_URL}/auth/register`, {email, password, phoneNumber, firstName, lastName}) 
-       return response.data
+        const response = await axios.post(`${BASE_URL}/auth/register`, { email, password, phoneNumber, firstName, lastName })
+        return response.data
     } catch (error) {
         catchAxiosError(error, "RegisterAPI Error");
         throw error
     }
 }
 
-export const VerifyEmailAPI = async({email, verificationCode}: VerifyEmail) => {
-      try {
+export const VerifyEmailAPI = async ({ email, verificationCode }: VerifyEmail) => {
+    try {
         const response = await axios.post(`${BASE_URL}/auth/verify-user`, { email, verificationCode })
         return response.data
     } catch (error) {
@@ -35,13 +35,15 @@ export const VerifyEmailAPI = async({email, verificationCode}: VerifyEmail) => {
     }
 }
 
-export const GetUserAPI = async()=> {
+export const GetUserAPI = async () => {
     try {
         const user = await getUserFromStorage()
         const token = user?.token
-        const response = await axios.get(`${BASE_URL}/getuserProfile`, { headers: {
-            Authorization: `Bearer ${token}`
-        }})
+        const response = await axios.get(`${BASE_URL}/getUserProfile`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
         return response.data
     } catch (error) {
         catchAxiosError(error, "GetUserAPI")

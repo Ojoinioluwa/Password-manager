@@ -6,7 +6,7 @@ import AboutPassword from "./AboutPassword";
 import PasswordStrengthChecker from "../../ui/PasswordStrength";
 import { useNavigate } from "react-router-dom";
 
-function ListPassowrds() {
+function ListPasswords() {
   const mockPasswords: Password[] = [
     {
       title: "Facebook",
@@ -105,7 +105,7 @@ function ListPassowrds() {
   // const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const mack = useMemo(() => {
     return mockPasswords.filter((password) => {
@@ -153,12 +153,13 @@ function ListPassowrds() {
                 size="medium"
                 className="font-bold"
                 type="button"
-                onClick={()=> navigate("/AddPassword")}
+                onClick={() => navigate("/AddPassword")}
               >
                 +ADD
               </Button>
             </div>
             <select
+              title="category"
               name="category"
               id="category"
               value={category}
@@ -176,7 +177,7 @@ function ListPassowrds() {
               <option value="Others">Others</option>{" "}
             </select>
           </div>
-          <div className=" w-full h-fit overflow-y-scroll hide-scrollbar">
+          <div className="w-full h-fit overflow-y-scroll hide-scrollbar">
             <ListUI data={mack} selected={selected} setSelected={setSelected} />
           </div>
         </div>
@@ -199,4 +200,4 @@ function ListPassowrds() {
   );
 }
 
-export default ListPassowrds;
+export default ListPasswords;

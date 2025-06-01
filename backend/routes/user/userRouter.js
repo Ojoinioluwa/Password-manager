@@ -17,6 +17,6 @@ userRouter.post('/auth/login', authLimiter, userController.login)
 userRouter.post("/auth/verify-user", userController.verifyUser)
 
 // get users profile
-userRouter.post("/getuserProfile", isAuthenticated, userController.getUserProfile)
+userRouter.post("/getUserProfile", isAuthenticated, userController.getUserProfile)
 
 module.exports = userRouter

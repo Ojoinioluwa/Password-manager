@@ -1,14 +1,9 @@
 const mongoose = require("mongoose");
 
-const authorizedUserSchema = new mongoose.Schema({
-    ownerId: {
+const authorizedGroupSchema = new mongoose.Schema({
+    groupId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
-    authorizedId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Group",
         required: true,
     },
     encryptedPassword: {
@@ -19,14 +14,14 @@ const authorizedUserSchema = new mongoose.Schema({
     expiresAt: {
         type: Date,
     },
-    iv: {
-        type: String,
-        required: true
-    },
+    authorizedUsers: [{ userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" } }],
     authorized: {
         type: Boolean,
         required: true,
         default: true
+    },
+    iv: {
+        type: String,
     },
     passwordId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -36,4 +31,4 @@ const authorizedUserSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-module.exports = mongoose.model("AuthorizedUser", authorizedUserSchema)
+module.exports = mongoose.model("AuthorizedGroup", authorizedGroupSchema)

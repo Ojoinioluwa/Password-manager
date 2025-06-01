@@ -4,6 +4,7 @@ import { BASE_URL } from "../../utils/url";
 import type { Password } from "../../types/passwordType";
 import catchAxiosError from "../../utils/catchAxiosError";
 
+
 export const AddPasswordAPI = async ({ url, email, encryptedPassword, iv, notes, title }: Password) => {
     try {
         const user = await getUserFromStorage()
@@ -20,6 +21,22 @@ export const AddPasswordAPI = async ({ url, email, encryptedPassword, iv, notes,
     } catch (error) {
         catchAxiosError(error, "AddPasswordAPI")
         throw error
+    }
+}
+
+export const EditPasswordAPI = async({encryptedPassword, iv}: {encryptedPassword: string, iv: string})=> {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token;
+        const response = await axios.put(`${BASE_URL}/vault/editPassword`, {encryptedPassword, iv}, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        return response.data
+    } catch (error) {
+     catchAxiosError(error, "EditPasswordAPI")  ;
+     throw error 
     }
 }
 

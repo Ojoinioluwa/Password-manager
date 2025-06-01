@@ -21,9 +21,6 @@ const groupSchema = new mongoose.Schema({
             authorized: { type: Boolean, required: true, default: true }
         }
     ],
-    iv: {
-        type: String,
-    },
     expiresAt: {
         type: Date
     },
@@ -47,14 +44,15 @@ const groupSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    encryptedPassword: {
-        type: String,
-    },
     authorized: {
         type: Boolean,
         required: true,
         default: true
     },
+    passwordId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Password"
+    }
     // image: {
     //     type: String,
     //     required: true

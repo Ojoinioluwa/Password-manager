@@ -19,7 +19,7 @@ const userController = {
 
         if (!firstName || !lastName || !email || !phoneNumber || !password) {
             res.status(400)
-            throw new Error('All fields are requried');
+            throw new Error('All fields are required');
         }
 
         if (!validator.isEmail(email)) {

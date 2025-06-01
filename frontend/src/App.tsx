@@ -5,7 +5,7 @@ import Register from "./components/auth/Register";
 import LoginForm from "./components/auth/Login";
 import VerifyEmail from "./components/auth/VerifyEmail";
 import AddPassword from "./components/vault/AddPassword";
-import ListPassowrds from "./components/vault/ListPassowrds";
+import ListPasswords from "./components/vault/ListPasswords";
 import EditPassword from "./components/vault/EditPassword";
 import MainDashboard from "./components/MainDashBoard";
 import PasswordStrengthChecker from "./ui/PasswordStrength";
@@ -15,6 +15,8 @@ import Test from "./components/vault/Test";
 import ListAuthorizedUsers from "./components/vault/authorize/ListAuthorized";
 import AuthorizeUser from "./components/vault/authorize/AuthorizeUser";
 import AddGroup from "./components/groups/AddGroup";
+import ListGroups from "./components/groups/ListGroups";
+import AboutGroups from "./components/groups/AboutGroups";
 
 function App() {
   return (
@@ -25,10 +27,12 @@ function App() {
         <Route path="/VerifyEmail" element={<VerifyEmail />} />
         <Route path="/AddPassword" element={<AddPassword />} />
         <Route path="/EditPassword" element={<EditPassword />} />
+        <Route path="/AboutGroups" element={<AboutGroups />} />
         <Route path="/dashboard" element={<MainDashboard />}>
-          <Route index element={<ListPassowrds />} />
-          <Route path="vault" element={<ListPassowrds />} />
+          <Route index element={<ListPasswords />} />
+          <Route path="vault" element={<ListPasswords />} />
           <Route path="test" element={<Test />} />
+          <Route path="groups" element={<ListGroups />} />
           <Route path="authorized" element={<ListAuthorizedUsers />} />
         </Route>
         <Route path="/strength" element={<PasswordStrengthChecker />} />

@@ -20,7 +20,7 @@ const validationSchema = Yup.object({
   url: Yup.string().url(),
   notes: Yup.string(),
   title: Yup.string().required("Title field is required"),
-  category: Yup.string().required("Category field is required")
+  category: Yup.string().required("Category field is required"),
 });
 
 interface RootState {
@@ -32,10 +32,10 @@ function AddPassword() {
     (state: RootState) => state.auth.masterSecrets
   );
 
-  const {data} = useQuery({
+  const { data } = useQuery({
     queryKey: ["GetUser"],
-    queryFn: GetUserAPI
-  })
+    queryFn: GetUserAPI,
+  });
 
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["AddPassword"],
@@ -48,12 +48,16 @@ function AddPassword() {
       url: "",
       notes: "",
       title: "",
-      category: ""
+      category: "",
     },
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const key = await generateUserKey({masterSecret, userId:data._id,salt: data.salt});
+        const key = await generateUserKey({
+          masterSecret,
+          userId: data.user._id,
+          salt: data.user.salt,
+        });
         const encrypted = await encrypt({ password: values.password, key });
         const response = await mutateAsync({
           email: values.email,
@@ -62,13 +66,13 @@ function AddPassword() {
           title: values.title,
           encryptedPassword: encrypted.data,
           iv: encrypted.iv,
-          category: values.category
+          category: values.category,
         });
         toast.success("Password Added Successfully");
         formik.resetForm();
         console.log(response.data);
       } catch (error) {
-        toast.error(`An error occured ${error}`);
+        toast.error(`An error occurred ${error}`);
       }
     },
   });
@@ -126,22 +130,23 @@ function AddPassword() {
             helperText="Enter the password you want to store securely"
           />
           <select
-              name="category"
-              id="category"
-              value={formik.values.category}
-              onChange={formik.handleChange("category")}
-              className="border border-gray-300 px-2 py-2.5 focus:border-blue-700 focus:border-2 rounded-lg"
-            >
-              <option value="">All Categories</option>
-              <option value="Social">Social</option>
-              <option value="Banking">Banking</option>
-              <option value="Email">Email</option>
-              <option value="Work">Work</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Utilities">Utilities</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Others">Others</option>{" "}
-            </select>
+            title="category"
+            name="category"
+            id="category"
+            value={formik.values.category}
+            onChange={formik.handleChange("category")}
+            className="border border-gray-300 px-2 py-2.5 focus:border-blue-700 focus:border-2 rounded-lg"
+          >
+            <option value="">All Categories</option>
+            <option value="Social">Social</option>
+            <option value="Banking">Banking</option>
+            <option value="Email">Email</option>
+            <option value="Work">Work</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Others">Others</option>{" "}
+          </select>
           <div>
             <textarea
               name="notes"
