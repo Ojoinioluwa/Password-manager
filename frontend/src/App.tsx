@@ -27,6 +27,7 @@ function App() {
         <Route path="/VerifyEmail" element={<VerifyEmail />} />
         <Route path="/AddPassword" element={<AddPassword />} />
         <Route path="/EditPassword" element={<EditPassword />} />
+        <Route path="/AboutGroups" element={<AboutGroups />} />
         <Route path="/dashboard" element={<MainDashboard />}>
           <Route index element={<ListPasswords />} />
           <Route path="vault" element={<ListPasswords />} />

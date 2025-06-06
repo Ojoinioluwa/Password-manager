@@ -1,6 +1,6 @@
 const express = require("express");
 const isAuthenticated = require("../../middlewares/isAuth");
-const groupController = require("../../controller/groupController");
+const groupController = require("../../controller/groupCtrl");
 
 const groupRouter = express.Router();
 

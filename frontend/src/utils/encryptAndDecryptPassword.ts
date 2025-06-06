@@ -19,57 +19,52 @@ function hex2ab(hex: string): ArrayBuffer {
 export async function generateUserKey(params: {
   masterSecret: string;
   userId: string;
-  salt: Uint8Array; // Expect salt as a raw byte array, not a string
+  salt: string; // salt passed as hex string
 }): Promise<CryptoKey> {
   const { masterSecret, userId, salt } = params;
 
-  // Input validation
-  if (!masterSecret.trim()) {
+  if (!masterSecret) {
     throw new Error("masterSecret must be a non-empty string");
   }
-  if (!(salt instanceof Uint8Array) || salt.byteLength < 16) {
-    throw new Error("salt must be a Uint8Array of at least 16 bytes");
+  if (!salt || salt.length < 32) { // 32 hex chars = 16 bytes
+    throw new Error("salt must be a hex string of at least 32 characters");
   }
   if (!userId.trim()) {
     throw new Error("userId must be a non-empty string");
   }
 
+  // Convert hex string salt to Uint8Array
+  const saltBytes = new Uint8Array(hex2ab(salt));
+  if (saltBytes.byteLength < 16) {
+    throw new Error("salt Uint8Array must be at least 16 bytes");
+  }
+
   const encoder = new TextEncoder();
 
-  let masterKey: CryptoKey;
-  try {
-    // Import the master secret as HKDF input keying material
-    masterKey = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(masterSecret), // consider pre-hashing if masterSecret is a passphrase
-      { name: 'HKDF' },
-      false,
-      ['deriveKey']
-    );
-  } catch (err: any) {
-    throw new Error(`Failed to import masterSecret for HKDF: ${err.message}`);
-  }
+  const masterKey = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(masterSecret),
+    { name: 'HKDF' },
+    false,
+    ['deriveKey']
+  );
 
-  let derivedKey: CryptoKey;
-  try {
-    derivedKey = await crypto.subtle.deriveKey(
-      {
-        name: 'HKDF',
-        hash: 'SHA-256',
-        salt: salt,                   // raw random bytes
-        info: encoder.encode(userId), // context info
-      },
-      masterKey,
-      { name: 'AES-GCM', length: 256 },
-      false,                           // mark as non-extractable unless you need to export it
-      ['encrypt', 'decrypt']
-    );
-  } catch (err: any) {
-    throw new Error(`Failed to derive AES-GCM key: ${err.message}`);
-  }
+  const derivedKey = await crypto.subtle.deriveKey(
+    {
+      name: 'HKDF',
+      hash: 'SHA-256',
+      salt: saltBytes,
+      info: encoder.encode(userId),
+    },
+    masterKey,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
 
   return derivedKey;
 }
+
 
 
 

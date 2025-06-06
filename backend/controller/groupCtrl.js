@@ -18,6 +18,13 @@ const groupController = {
             throw new Error("Fill in all required Fields")
         }
 
+        const groupExist = await Group.findOne({ name });
+
+        if (groupExist) {
+            res.status(401)
+            throw new Error("Group already exist")
+        }
+
 
         const group = await Group.create({
             description,

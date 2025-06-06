@@ -11,6 +11,7 @@ import { EditPasswordAPI } from "../../services/password/passwordServices";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { GetUserAPI } from "../../services/user/userServices";
+import { useParams } from "react-router-dom";
 
 interface RootState {
   auth: { masterSecrets: string };
@@ -30,8 +31,7 @@ function EditPassword() {
     (state: RootState) => state.auth.masterSecrets
   );
 
-  // const
-
+  const { passwordId } = useParams();
   const { data } = useQuery({
     queryKey: ["GetUser"],
     queryFn: GetUserAPI,
@@ -41,6 +41,7 @@ function EditPassword() {
     mutationKey: ["EditPassword"],
     mutationFn: EditPasswordAPI,
   });
+
   const formik = useFormik({
     initialValues: {
       password: "",
@@ -57,6 +58,7 @@ function EditPassword() {
         const response = await mutateAsync({
           encryptedPassword: encrypted.data,
           iv: encrypted.iv,
+          passwordId: passwordId!,
         });
         toast.success("Password Added Successfully");
         formik.resetForm();
@@ -66,6 +68,7 @@ function EditPassword() {
       }
     },
   });
+
   return (
     <div className="flex justify-center items-center min-h-[100vh] w-full bg-gray-100">
       <div className="w-full md:w-1/2 h-fit flex items-center pt-4 gap-3 flex-col px-4 lg:px-[100px]">

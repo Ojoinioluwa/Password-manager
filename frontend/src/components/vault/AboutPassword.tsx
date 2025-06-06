@@ -9,7 +9,7 @@ import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { useNavigate } from "react-router-dom";
 
 type About = {
-  _id: string;
+  _id?: string;
   logo?: string;
   title?: string;
   category?: string;
@@ -21,7 +21,6 @@ type About = {
 
 function AboutPassword({
   _id,
-  logo,
   title,
   category,
   email,
@@ -42,6 +41,11 @@ function AboutPassword({
       console.error("Failed to copy:", err);
     }
   };
+
+  const apiKey = "pk_DvZCIz0oTZ6ajtOf0L9nnA"; // your key here
+  const imgUrl = `https://img.logo.dev/${
+    url?.split("//")[1]
+  }?token=${apiKey}&size=250&format=png`;
 
   return (
     <div className="px-5 py-2 border border-gray-300 w-full h-full">
@@ -76,7 +80,7 @@ function AboutPassword({
       <Divider />
       <div className="flex gap-3 py-4">
         <img
-          src={logo}
+          src={imgUrl}
           alt=""
           className="h-[50px] w-[50px] rounded-md object-cover"
         />

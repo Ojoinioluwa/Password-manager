@@ -55,6 +55,7 @@ export const DeletePasswordAPI = async ({ passwordId }: { passwordId: string }) 
         throw error
     }
 }
+
 export const GetPasswordByIdAPI = async ({ passwordId }: { passwordId: string }) => {
     try {
         const user = await getUserFromStorage();
@@ -70,7 +71,6 @@ export const GetPasswordByIdAPI = async ({ passwordId }: { passwordId: string })
         throw error
     }
 }
-
 
 export const GetAllPasswordsAPI = async () => {
     try {
@@ -89,14 +89,7 @@ export const GetAllPasswordsAPI = async () => {
 }
 
 
-
-
-
-
-
-
-
-// ===================================Check breach==========================
+//  ===================================Check breach==========================
 
 export const CheckEMailBreachAPI = async ({ email }: { email: string }) => {
     try {

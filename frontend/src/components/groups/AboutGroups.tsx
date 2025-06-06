@@ -3,10 +3,11 @@ import type { Password } from "../../types/passwordType";
 import { useEffect, useMemo, useState } from "react";
 import GroupCard from "../../ui/GroupCard";
 import { useNavigate } from "react-router-dom";
-import ListAuthorizedUsers from "../vault/authorize/ListAuthorized";
+// import ListAuthorizedUsers from "../vault/authorize/ListAuthorized";
 import { Avatar, IconButton } from "@mui/material";
 import SouthIcon from "@mui/icons-material/South";
 import NorthIcon from "@mui/icons-material/North";
+import ListAuthorizedUsers from "../../ui/ListAuthorizedUI";
 
 function AboutGroups() {
   const mockPasswords: Password[] = [

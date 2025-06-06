@@ -4,6 +4,7 @@ import { getUserFromStorage } from "../../utils/getUserFromStorage";
 import type { LocalSorageInfo } from "../../types/userType";
 
 const userInfo = getUserFromStorage();
+const savedMasterSecret = localStorage.getItem("masterSecret");
 
 interface AuthState {
     user: LocalSorageInfo | null;
@@ -12,7 +13,7 @@ interface AuthState {
 
 const initialState: AuthState = {
     user: userInfo || null,
-    masterSecret: null,
+    masterSecret: savedMasterSecret || null,
 };
 
 const authSlice = createSlice({

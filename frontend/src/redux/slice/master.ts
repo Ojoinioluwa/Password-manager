@@ -3,14 +3,14 @@ import { createSlice } from '@reduxjs/toolkit';
 const masterSlice = createSlice({
     name: "master",
     initialState: {
-        masterSeceret: null
-    }, 
+        masterSecret: null
+    },
     reducers: {
-        addSecerets: (state,action)=> {
-            state.masterSeceret = action.payload.secrets
+        addSecrets: (state, action) => {
+            state.masterSecret = action.payload.secrets
         },
         removeSecrets: (state) => {
-            state.masterSeceret = null
+            state.masterSecret = null
         }
     }
 })
@@ -18,4 +18,4 @@ const masterSlice = createSlice({
 
 const masterReducer = masterSlice.reducer;
 export default masterReducer;
-export const  {addSecerets, removeSecrets} = masterSlice.actions
+export const { addSecrets, removeSecrets } = masterSlice.actions

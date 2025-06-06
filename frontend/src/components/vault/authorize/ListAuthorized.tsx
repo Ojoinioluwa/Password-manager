@@ -1,9 +1,3 @@
-// import { useQuery } from "@tanstack/react-query";
-// import {
-//   ListAllDepartmentsAPI,
-//   ListStudentsAPI,
-// } from "../../../../Service/Admin/adminService";
-// import { useState } from "react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -11,21 +5,15 @@ import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import EditIcon from "@mui/icons-material/Edit";
 import { useMemo, useState } from "react";
-
-// import Loading from "../../State/Loading";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  GetAuthorizedUsersAPI,
+  ToggleAuthorizedUserAPI,
+  DeleteAuthorizedUserAPI,
+} from "../../../services/Authorize/authorizeService";
+import Loading from "../../../State/Loading";
 
 function ListAuthorizedUsers() {
-  // const {
-  //   data: studentResponse,
-  //   isLoading,
-  // } = useQuery({
-  //   queryKey: ["ListStudents", filters],
-  //   queryFn: () => ListStudentsAPI(filters),
-  //   // enabled: !!filters.department,
-  // });
-
-  // if (isLoading || deptLoading) return <Loading />;
-
   const [search, setSearch] = useState("");
 
   const authorizedUsers = [
@@ -222,115 +210,119 @@ function ListAuthorizedUsers() {
     // ... Add up to 30+ entries by duplicating or varying users/passwords
   ];
 
-  const users = useMemo(() => {
-    return authorizedUsers.filter(
-      (user) =>
-        user.firstName.toLowerCase().includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase())
+  // const { data: authorizedUsers, isLoading } = useQuery({
+  //   queryKey: ["GetAuthorizedUsers"],
+  //   queryFn: GetAuthorizedUsersAPI,
+  // });
+
+  const { mutateAsync: toggleUser } = useMutation({
+    mutationKey: ["ToggleAuthorizedUser"],
+    mutationFn: ToggleAuthorizedUserAPI,
+  });
+
+  const { mutateAsync: deleteUser } = useMutation({
+    mutationKey: ["DeleteAuthorizedUser"],
+    mutationFn: DeleteAuthorizedUserAPI,
+  });
+
+  const handleToggle = async (authorizedId: string) => {
+    try {
+      await toggleUser({ authorizedId });
+    } catch (err) {
+      console.error("Toggle failed:", err);
+    }
+  };
+
+  const handleDelete = async (authorizedId: string) => {
+    if (confirm("Are you sure you want to delete this user?")) {
+      try {
+        await deleteUser({ authorizedId });
+      } catch (err) {
+        console.error("Delete failed:", err);
+      }
+    }
+  };
+
+  const handleEdit = (user) => {
+    // Example: open edit modal or navigate with user data
+    console.log("Edit user:", user);
+    // You can replace with: openModal(user) or navigate(`/edit/${user.authorizedId}`)
+  };
+
+  const filteredUsers = useMemo(() => {
+    if (!authorizedUsers) return [];
+    return authorizedUsers.filter((user) =>
+      user.firstName.toLowerCase().includes(search.toLowerCase())
     );
   }, [search]);
 
+  // if (isLoading) return <Loading />;
+
   return (
-    <div className="min-h-screen h-[100vh] bg-transparent m-3 rounded-xl p-4 flex flex-col gap-6">
-      {/* Filters */}
-      <div className="bg-stone-50 rounded-lg p-4 flex flex-col md:flex-row justify-between gap-4 items-center shadow-sm">
-        <h4 className="text-xl font-semibold text-blue-800">
-          List of Users authorized with passwords
-        </h4>
-        <div className="flex flex-wrap gap-3">
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or ID"
-            className="border border-gray-300 rounded-full px-3 py-1.5 text-sm w-52"
-          />
-        </div>
-      </div>
+    <div className="p-4">
+      <input
+        className="mb-4 p-2 border rounded w-full"
+        type="text"
+        placeholder="Search by name..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-      {/* Students Table */}
-      <div className="overflow-y-scroll hide-scrollbar bg-white h-[70vh] rounded-xl shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200 text-sm ">
-          <thead className="bg-gray-100 sticky top-0 z-10">
-            <tr>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Email</th>
-              <th className="px-4 py-2 text-left">Password ID</th>
-              <th className="px-4 py-2 text-left">Authorized</th>
-              <th className="px-4 py-2 text-left">expiresAt</th>
-              <th className="px-4 py-2 text-left">Actions</th>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="text-left bg-gray-100">
+            <th className="p-2">Name</th>
+            <th className="p-2">Email</th>
+            <th className="p-2">Status</th>
+            <th className="p-2">Expires At</th>
+            <th className="p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredUsers.map((user) => (
+            <tr
+              key={user.encryptedPassword}
+              className="border-b hover:bg-gray-50"
+            >
+              <td className="p-2">{user.firstName}</td>
+              <td className="p-2">{user.email}</td>
+              <td className="p-2">
+                {user.authorized ? (
+                  <CheckCircleOutlineIcon color="success" />
+                ) : (
+                  <CancelOutlinedIcon color="error" />
+                )}
+              </td>
+              <td className="p-2">
+                {user.expiresAt
+                  ? new Date(user.expiresAt).toLocaleDateString()
+                  : "No expiry"}
+              </td>
+              <td className="p-2 flex items-center space-x-2">
+                <button
+                  onClick={() => handleToggle(user.authorizedId)}
+                  title="Toggle Authorization"
+                >
+                  {user.authorized ? (
+                    <ToggleOnIcon color="success" />
+                  ) : (
+                    <ToggleOffIcon color="disabled" />
+                  )}
+                </button>
+                <button onClick={() => handleEdit(user)} title="Edit">
+                  <EditIcon />
+                </button>
+                <button
+                  onClick={() => handleDelete(user.authorizedId)}
+                  title="Delete"
+                >
+                  <DeleteOutlineIcon color="error" />
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 overflow-y-scroll">
-            {users.map((user, index) => (
-              <tr
-                key={index}
-                className={`hover:bg-purple-50 ${
-                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                }`}
-              >
-                <td className="px-4 py-3">{user.firstName}</td>
-                <td className="px-4 py-3">{user.email}</td>
-                <td className="px-4 py-3 text-gray-500 font-mono">
-                  {user.encryptedPassword}
-                </td>
-                <td className="px-4 py-3">
-                  {user.authorized ? (
-                    <CheckCircleOutlineIcon
-                      className="text-green-600 cursor-pointer"
-                      fontSize="small"
-                      titleAccess="Click to unauthorize"
-                      onClick={() => console.log("toggled")}
-                    />
-                  ) : (
-                    <CancelOutlinedIcon
-                      className="text-red-500 cursor-pointer"
-                      fontSize="small"
-                      titleAccess="Click to authorize"
-                      onClick={() => console.log("toggled")}
-                    />
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  {user.expiresAt
-                    ? user.expiresAt?.toString().split("T")[0]
-                    : "NIL"}
-                </td>
-                <td className="px-4 py-3 flex gap-5">
-                  <DeleteOutlineIcon
-                    className="text-gray-600 hover:text-red-600 cursor-pointer"
-                    fontSize="small"
-                    titleAccess="Delete user"
-                    onClick={() => console.log("delete")}
-                  />
-
-                  {user.authorized ? (
-                    <ToggleOnIcon
-                      className="text-green-600 cursor-pointer"
-                      fontSize="medium"
-                      onClick={() => console.log(user)}
-                      titleAccess="Click to unauthorize"
-                    />
-                  ) : (
-                    <ToggleOffIcon
-                      className="text-gray-400 cursor-pointer"
-                      fontSize="medium"
-                      onClick={() => console.log(user)}
-                      titleAccess="Click to authorize"
-                    />
-                  )}
-                  <EditIcon
-                    className="text-blue-500 cursor-pointer hover:text-blue-700"
-                    fontSize="medium"
-                    onClick={() => console.log(user)}
-                    titleAccess="Edit User"
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

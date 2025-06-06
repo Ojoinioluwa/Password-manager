@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CheckEMailBreachAPI } from "../services/password/passwordServices";
+import Loading from "../State/Loading";
+import { toast } from "react-toastify";
 
 interface Breach {
   Name: string;
@@ -45,10 +47,24 @@ const EmailPwnedChecker: React.FC = () => {
       </div>
     );
   }
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen">
+        <Loading />
+      </div>
+    );
+  }
+
+  if (isError) {
+    toast.error("an error occurred please try again later");
+    return <div className="h-screen w-full">{error.message}</div>;
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-6">
-      <h2 className="text-3xl font-bold text-center">🔍 Email Breach Checker</h2>
+      <h2 className="text-3xl font-bold text-center">
+        🔍 Email Breach Checker
+      </h2>
 
       <input
         type="email"
@@ -81,11 +97,21 @@ const EmailPwnedChecker: React.FC = () => {
           {breaches.map((breach: Breach, index: number) => (
             <div key={index} className="border-t border-red-300 pt-3">
               <h4 className="font-bold text-lg">{breach.Title}</h4>
-              <p><strong>Domain:</strong> {breach.Domain}</p>
-              <p><strong>Breach Date:</strong> {breach.BreachDate}</p>
-              <p><strong>Added to HIBP:</strong> {breach.AddedDate}</p>
-              <p><strong>Verified:</strong> {breach.IsVerified ? "Yes" : "No"}</p>
-              <p><strong>Exposed Data:</strong> {breach.DataClasses.join(", ")}</p>
+              <p>
+                <strong>Domain:</strong> {breach.Domain}
+              </p>
+              <p>
+                <strong>Breach Date:</strong> {breach.BreachDate}
+              </p>
+              <p>
+                <strong>Added to HIBP:</strong> {breach.AddedDate}
+              </p>
+              <p>
+                <strong>Verified:</strong> {breach.IsVerified ? "Yes" : "No"}
+              </p>
+              <p>
+                <strong>Exposed Data:</strong> {breach.DataClasses.join(", ")}
+              </p>
               <p
                 className="text-sm"
                 dangerouslySetInnerHTML={{ __html: breach.Description }}
@@ -98,7 +124,8 @@ const EmailPwnedChecker: React.FC = () => {
       {breaches && breaches.length === 0 && (
         <div className="bg-green-50 border border-green-400 text-green-800 p-4 rounded-md">
           <h3 className="text-lg font-semibold">
-            ✅ Good news — this email has not been found in any known data breaches.
+            ✅ Good news — this email has not been found in any known data
+            breaches.
           </h3>
         </div>
       )}

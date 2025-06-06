@@ -2,8 +2,8 @@ import type { LocalSorageInfo } from "../types/userType";
 
 
 export const getUserFromStorage = (): LocalSorageInfo | null => {
-    const stored = localStorage.getItem("UserInfo");
-    if(!stored) return null;
+    const stored = localStorage.getItem("userInfo");
+    if (!stored) return null;
     try {
         const parsedUser = JSON.parse(stored)
         return parsedUser

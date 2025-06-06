@@ -1,17 +1,21 @@
 import { Button } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LoginImage from "../../assets/login.jpeg";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { useMutation } from "@tanstack/react-query";
-import { LoginAPI } from "../../services/user/userServices";
+import { LoginAPI, GetSaltAPI } from "../../services/user/userServices";
 import { useDispatch } from "react-redux";
-import { loginAction } from "../../redux/slice/authSlice";
+import { loginAction, setMasterSecret } from "../../redux/slice/authSlice";
 import type { Login, LoginResponse } from "../../types/userType";
 import { InputField } from "../../ui/InputUI";
 import { ButtonUI } from "../../ui/ButtonUI";
+import { deriveMasterSecretFromPassword } from "../../utils/genMasterSecrets";
+import { useEffect, useState } from "react";
+import debounce from "lodash/debounce";
+import { toast } from "react-toastify";
 
 const validationSchema = Yup.object({
   email: Yup.string().email().required("Email Field is required"),
@@ -22,40 +26,84 @@ const validationSchema = Yup.object({
 
 function LoginForm() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [salt, setSalt] = useState<string | null>(null);
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["Login"],
     mutationFn: LoginAPI,
   });
+
   const formik = useFormik<Login>({
     initialValues: {
       email: "",
       password: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
-      mutateAsync(values)
-        .then((data: LoginResponse) => {
-          dispatch(
-            loginAction({
-              token: data.token,
-              email: data.user.email,
-              firstName: data.user.firstName,
-            })
-          );
-          localStorage.setItem(
-            "userInfo",
-            JSON.stringify({
-              token: data.token,
-              email: data.user.email,
-              firstName: data.user.firstName,
-            })
-          );
-          formik.resetForm();
-        })
-        .catch((err: unknown) => console.log(err));
+    onSubmit: async (values) => {
+      try {
+        const data: LoginResponse = await mutateAsync(values);
+
+        if (!salt) throw new Error("Salt not available");
+
+        const masterSecret = await deriveMasterSecretFromPassword(
+          values.password,
+          salt
+        );
+
+        dispatch(
+          loginAction({
+            token: data.token,
+            email: data.user.email,
+            firstName: data.user.firstName,
+          })
+        );
+
+        dispatch(setMasterSecret(masterSecret));
+        localStorage.setItem("masterSecret", masterSecret);
+
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify({
+            token: data.token,
+            email: data.user.email,
+            firstName: data.user.firstName,
+          })
+        );
+
+        formik.resetForm();
+        navigate("/dashboard");
+      } catch (err) {
+        console.log(err);
+        toast.error("Login failed. Please check your credentials.");
+      }
     },
   });
+
+  useEffect(() => {
+    const email = formik.values.email.trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setSalt(null); // reset salt if email is invalid
+      return;
+    }
+
+    const fetchSalt = debounce(async () => {
+      try {
+        const res = await GetSaltAPI(email);
+        setSalt(res.salt);
+      } catch (error) {
+        console.error("Failed to fetch salt:", error);
+        setSalt(null);
+      }
+    }, 400); // delay to avoid spamming on fast typing
+
+    fetchSalt();
+    return () => {
+      fetchSalt.cancel(); // ✅ cleanup
+    };
+  }, [formik.values.email]);
+
   return (
     <div className="flex justify-center items-center h-[100vh] w-full bg-gray-100">
       <div className="w-full md:w-1/2 h-[100vh] flex items-center pt-[10vh] gap-3 flex-col px-4 lg:px-[100px]">
@@ -92,7 +140,7 @@ function LoginForm() {
           >
             forgot password?
           </Link>
-          <ButtonUI isPending={isPending} name="Login"/>
+          <ButtonUI isPending={isPending} name="Login" />
         </form>
         {/* the dividing line before and after login with */}
         <div className="w-full flex items-center justify-center my-3">

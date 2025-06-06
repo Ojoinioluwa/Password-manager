@@ -21,6 +21,7 @@
     "crypto-js": "^4.2.0",
     "formik": "^2.4.6",
     "generate-password": "^1.7.1",
+    "lodash": "^4.17.21",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
@@ -34,6 +35,8 @@
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@tanstack/eslint-plugin-query": "^5.74.7",
+    "@types/lodash": "^4.17.17",
+    "@types/node": "^22.15.29",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@types/zxcvbn": "^4.4.5",

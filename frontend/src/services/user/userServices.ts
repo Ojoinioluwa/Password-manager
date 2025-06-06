@@ -37,15 +37,32 @@ export const VerifyEmailAPI = async ({ email, verificationCode }: VerifyEmail) =
 
 export const GetUserAPI = async () => {
     try {
-        const user = await getUserFromStorage()
-        const token = user?.token
+        const user = await getUserFromStorage();
+        const token = user?.token;
+
+        if (!token) {
+            alert("Toke not found")
+            throw new Error("No token found in storage");
+        }
+
         const response = await axios.get(`${BASE_URL}/getUserProfile`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
-        })
-        return response.data
+        });
+        return response.data;
     } catch (error) {
-        catchAxiosError(error, "GetUserAPI")
+        catchAxiosError(error, "GetUserAPI");
     }
-}
+};
+
+export const GetSaltAPI = async (email: string): Promise<{ message: string; salt: string } | undefined> => {
+    try {
+        const encodedEmail = encodeURIComponent(email);
+        const response = await axios.get(`${BASE_URL}/getSalt?email=${encodedEmail}`);
+        return response.data;
+    } catch (error) {
+        catchAxiosError(error, "GetSaltAPI");
+        return undefined;
+    }
+};

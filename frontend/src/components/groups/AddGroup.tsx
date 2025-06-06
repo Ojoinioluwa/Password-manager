@@ -2,22 +2,23 @@ import { InputField } from "../../ui/InputUI";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@tanstack/react-query";
-import { AddAuthorizeUserAPI } from "../../services/Authorize/authorizeService"; 
 import { ButtonUI } from "../../ui/ButtonUI";
-
+import { CreateGroupAPI } from "../../services/group/groupServices";
+import { toast } from "react-toastify";
 
 const validationSchema = Yup.object({
-  name: Yup.string()
-    .required("Name of the group is required"),
+  name: Yup.string().required("Name of the group is required"),
   expiresAt: Yup.date().nullable(),
   type: Yup.string().required("Group type is required"),
-  description: Yup.string().required("Write a brief description about the group")
+  description: Yup.string().required(
+    "Write a brief description about the group"
+  ),
 });
 
 function AddGroup() {
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["AuthorizeUser"],
-    mutationFn: AddAuthorizeUserAPI,
+    mutationFn: CreateGroupAPI,
   });
 
   const formik = useFormik({
@@ -25,26 +26,30 @@ function AddGroup() {
       name: "",
       expiresAt: "",
       type: "",
+      description: "",
     },
     validationSchema,
     onSubmit: async (values) => {
-
       try {
-          const data = await mutateAsync({
-        name: values.name,
-        expiresAt: values.expiresAt,
-      });
-      alert("Group added successfully")
+        const data = await mutateAsync({
+          name: values.name,
+          expiresAt: values.expiresAt,
+          type: values.type,
+          description: values.description,
+        });
+        console.log(data);
+        toast.success("Group added successfully");
       } catch (error) {
-        console.log(error)
-        alert(error)
+        toast.error(`error creating group ${error}`);
       }
-    
     },
   });
   return (
     <div className="bg-gray-100 h-[100vh] py-[15px] px-4 flex items-center justify-center">
-      <form className="flex flex-col gap-3 px-5 py-3 bg-white shadow-lg rounded-lg  w-[80vw] md:w-[50vw] lg:w-[30vw]">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="flex flex-col gap-3 px-5 py-3 bg-white shadow-lg rounded-lg  w-[80vw] md:w-[50vw] lg:w-[30vw]"
+      >
         <div className="bg-gray-100 px-2 py-3 rounded-lg shadow">
           <h2 className="text-blue-950 text-base font-bold text-center mb-3">
             Create Group
@@ -68,11 +73,12 @@ function AddGroup() {
           label=""
         />
         <select
-          title="category"
-          name="category"
-          id="category"
+          title="type"
+          name="type"
+          id="type"
           value={formik.values.type}
-          onChange={(e) => console.log(e.target.value)}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           className="border border-gray-300 px-2 py-2.5 focus:border-blue-700 focus:border-2 rounded-lg"
         >
           <option value="">Select Group type</option>
@@ -88,21 +94,23 @@ function AddGroup() {
           <option value="others">Others</option>
         </select>
 
-         <div>
-            <textarea
-              name="description"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="border border-gray-400 w-full outline-blue-600 rounded-lg p-3"
-              placeholder="A brief talk about the account"
-            />
-            {formik.touched.description && formik.errors.description && (
-              <div className="text-red-500 text-sm">{formik.errors.description}</div>
-            )}
-          </div>
+        <div>
+          <textarea
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="border border-gray-400 w-full outline-blue-600 rounded-lg p-3"
+            placeholder="A brief talk about the account"
+          />
+          {formik.touched.description && formik.errors.description && (
+            <div className="text-red-500 text-sm">
+              {formik.errors.description}
+            </div>
+          )}
+        </div>
 
-        <ButtonUI isPending={isPending} name="Authorize" />
+        <ButtonUI isPending={isPending} name="Create Group" />
       </form>
     </div>
   );

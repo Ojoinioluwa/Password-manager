@@ -177,7 +177,27 @@ const userController = {
             message: "Fetched user profile successfully",
             user
         })
+    }),
+
+    getUserSalt: asyncHandler(async (req, res) => {
+        const email = (req.query.email || "").trim().toLowerCase();
+
+        if (!email || !validator.isEmail(email)) {
+            return res.status(400).json({ message: "Enter a valid email" });
+        }
+
+        const user = await User.findOne({ email }).select("salt");
+
+        if (!user || !user.salt) {
+            return res.status(404).json({ message: "User does not exist or salt unavailable" });
+        }
+
+        res.status(200).json({
+            message: "User salt fetched",
+            salt: user.salt
+        });
     })
+
 
 }
 

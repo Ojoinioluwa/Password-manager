@@ -8,7 +8,6 @@ import {
   generateUserKey,
 } from "../../utils/encryptAndDecryptPassword";
 import { AddPasswordAPI } from "../../services/password/passwordServices";
-// import type { Password } from "../../types/passwordType";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import type { PasswordFormValues } from "../../types/passwordType";
@@ -24,13 +23,17 @@ const validationSchema = Yup.object({
 });
 
 interface RootState {
-  auth: { masterSecrets: string };
+  auth: { masterSecret: string };
 }
 
 function AddPassword() {
   const masterSecret = useSelector(
-    (state: RootState) => state.auth.masterSecrets
+    (state: RootState) => state.auth.masterSecret
   );
+
+  if (!masterSecret) {
+    console.log("NO master secret");
+  }
 
   const { data } = useQuery({
     queryKey: ["GetUser"],
@@ -53,6 +56,7 @@ function AddPassword() {
     validationSchema,
     onSubmit: async (values) => {
       try {
+        console.log(data.user);
         const key = await generateUserKey({
           masterSecret,
           userId: data.user._id,
@@ -73,9 +77,11 @@ function AddPassword() {
         console.log(response.data);
       } catch (error) {
         toast.error(`An error occurred ${error}`);
+        console.log(error);
       }
     },
   });
+
   return (
     <div className="flex justify-center items-center min-h-[100vh] w-full bg-gray-100">
       <div className="w-full md:w-1/2 h-fit flex items-center pt-4 gap-3 flex-col px-4 lg:px-[100px]">
