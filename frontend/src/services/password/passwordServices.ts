@@ -5,7 +5,7 @@ import type { Password } from "../../types/passwordType";
 import catchAxiosError from "../../utils/catchAxiosError";
 
 
-export const AddPasswordAPI = async ({ url, email, encryptedPassword, iv, notes, title }: Password) => {
+export const AddPasswordAPI = async ({ url, email, encryptedPassword, iv, notes, title, category }: Password) => {
     try {
         const user = await getUserFromStorage()
         const token = user?.token
@@ -15,7 +15,8 @@ export const AddPasswordAPI = async ({ url, email, encryptedPassword, iv, notes,
             encryptedPassword,
             iv,
             notes,
-            title
+            title,
+            category
         }, { headers: { Authorization: `Bearer ${token}` } })
         return response.data
     } catch (error) {

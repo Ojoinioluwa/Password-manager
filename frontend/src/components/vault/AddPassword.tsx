@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import type { PasswordFormValues } from "../../types/passwordType";
 import { GetUserAPI } from "../../services/user/userServices";
+import { useNavigate } from "react-router-dom";
 
 const validationSchema = Yup.object({
   email: Yup.string().email().required("Email Field is required"),
@@ -40,6 +41,7 @@ function AddPassword() {
     queryFn: GetUserAPI,
   });
 
+  const navigate = useNavigate();
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["AddPassword"],
     mutationFn: AddPasswordAPI,
@@ -63,7 +65,7 @@ function AddPassword() {
           salt: data.user.salt,
         });
         const encrypted = await encrypt({ password: values.password, key });
-        const response = await mutateAsync({
+        await mutateAsync({
           email: values.email,
           notes: values.notes,
           url: values.url,
@@ -72,9 +74,10 @@ function AddPassword() {
           iv: encrypted.iv,
           category: values.category,
         });
+        console.log(values);
         toast.success("Password Added Successfully");
         formik.resetForm();
-        console.log(response.data);
+        navigate("/dashboard");
       } catch (error) {
         toast.error(`An error occurred ${error}`);
         console.log(error);

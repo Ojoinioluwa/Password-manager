@@ -65,9 +65,6 @@ export async function generateUserKey(params: {
   return derivedKey;
 }
 
-
-
-
 export async function encrypt(params: { password: string; key: CryptoKey }): Promise<{ iv: string; data: string }> {
   const { password, key } = params;
   const iv = window.crypto.getRandomValues(new Uint8Array(12));

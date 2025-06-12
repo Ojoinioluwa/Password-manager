@@ -28,7 +28,7 @@ function ListGroups() {
   }
 
   const handleAddGroup = () => {
-    navigate("/AddGroup");
+    navigate("/dashboard/AddGroup");
   };
 
   if (isError || !groups || groups.groups.length === 0) {

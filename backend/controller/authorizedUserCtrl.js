@@ -15,16 +15,31 @@ const authorizedUserController = {
             throw new Error("Invalid password ID");
         }
 
-        const user = await User.findOne({ email }).select("_id");
-        if (!user) {
-            res.status(404)
-            throw new Error("User does not exist. Cannot authorize a user who is not a participant on this site.")
+        if (!email) {
+            res.status(400);
+            throw new Error("Email is required");
         }
-
         if (!iv || !encryptedPassword) {
             res.status(400);
             throw new Error("Please ensure you encrypt the password")
         }
+
+        const user = await User.findOne({ email }).select("_id email");
+        if (!user) {
+            res.status(404)
+            throw new Error("User does not exist. Cannot authorize a user who is not a participant on this site.")
+        }
+        const owner = await User.findById(req.user.id).select("email");
+        if (!owner) {
+            res.status(404)
+            throw new Error("You don't exist in the database. try again")
+        }
+
+        if (owner.email === email) {
+            res.status(403);
+            throw new Error("User can not Authorize him self")
+        }
+
 
         const existing = await AuthorizedUser.findOne({ authorizedId: user._id, ownerId: req.user.id, passwordId });
         if (existing) {
@@ -35,7 +50,7 @@ const authorizedUserController = {
 
         const authorizedUser = await AuthorizedUser.create({
             authorizedId: user._id,
-            expiresAt,
+            expiresAt: expiresAt ? new Date(expiresAt) : null,
             encryptedPassword,
             iv,
             ownerId: req.user.id,
@@ -54,7 +69,7 @@ const authorizedUserController = {
     getAuthorizedUsers: asyncHandler(async (req, res) => {
         const authorizedUsers = await AuthorizedUser.find({
             ownerId: req.user.id
-        }).lean();
+        }).populate("authorizedId", "firstName email").lean();
         res.status(200).json({
             message: "Authorized users fetched successfully",
             authorizedUsers

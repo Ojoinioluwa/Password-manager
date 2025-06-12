@@ -12,8 +12,7 @@ const authorizedUserSchema = new mongoose.Schema({
         required: true,
     },
     encryptedPassword: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Password",
+        type: String,
         required: true
     },
     expiresAt: {

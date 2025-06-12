@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ButtonUI } from "../../ui/ButtonUI";
 import { CreateGroupAPI } from "../../services/group/groupServices";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name of the group is required"),
@@ -16,6 +17,7 @@ const validationSchema = Yup.object({
 });
 
 function AddGroup() {
+  const navigate = useNavigate();
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["AuthorizeUser"],
     mutationFn: CreateGroupAPI,
@@ -39,6 +41,8 @@ function AddGroup() {
         });
         console.log(data);
         toast.success("Group added successfully");
+        formik.resetForm();
+        navigate(-1);
       } catch (error) {
         toast.error(`error creating group ${error}`);
       }

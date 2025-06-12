@@ -18,6 +18,6 @@ userRouter.post("/auth/verify-user", userController.verifyUser)
 
 // get users profile
 userRouter.get("/getUserProfile", isAuthenticated, userController.getUserProfile)
-userRouter.get("/getSalt", userController.getUserSalt)
+userRouter.get("/getSaltAndId", userController.getUserSaltAndId)
 
 module.exports = userRouter

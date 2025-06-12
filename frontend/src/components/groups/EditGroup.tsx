@@ -15,7 +15,7 @@ const validationSchema = Yup.object({
 });
 
 function EditGroup() {
-  const { groupId } = useParams();
+  const { groupId } = useParams() as { groupId: string };
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["EditGroup"],
     mutationFn: UpdateGroupAPI,

@@ -179,7 +179,7 @@ const userController = {
         })
     }),
 
-    getUserSalt: asyncHandler(async (req, res) => {
+    getUserSaltAndId: asyncHandler(async (req, res) => {
         const email = (req.query.email || "").trim().toLowerCase();
 
         if (!email || !validator.isEmail(email)) {
@@ -194,7 +194,8 @@ const userController = {
 
         res.status(200).json({
             message: "User salt fetched",
-            salt: user.salt
+            salt: user.salt,
+            id: user._id
         });
     })
 

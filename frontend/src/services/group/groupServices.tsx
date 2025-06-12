@@ -61,6 +61,23 @@ export const UpdateGroupAPI = async ({
   }
 };
 
+export const GetGroupById = async ({ groupId }: { groupId: string }) => {
+  try {
+    const user = await getUserFromStorage();
+    const token = user?.token;
+
+    const response = await axios.get(`${BASE_URL}/group/${groupId}/groupInfo`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    catchAxiosError(error, "GetGroupById");
+  }
+};
+
 export const DeleteGroupAPI = async ({ groupId }: { groupId: string }) => {
   try {
     const user = await getUserFromStorage();

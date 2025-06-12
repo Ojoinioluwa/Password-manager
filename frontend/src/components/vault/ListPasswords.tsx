@@ -73,29 +73,32 @@ function ListPasswords() {
 
   return (
     <>
-      <div className="w-full h-fit mx-auto flex flex-col md:flex-row gap-4 p-10 bg-gray-50">
-        <div className="h-[70vh] lg:h-[100vh] border border-gray-300 w-full md:w-7/12  flex-col gap-2 md:flex lg:flex px-3 items-center justify-center py-3">
-          <div className="flex justify-between w-full h-[70px]  items-center">
-            <div className="flex gap-2 h-[70px]  items-center">
+      <div className="w-full max-w-screen-xl mx-auto flex flex-col md:flex-row gap-6 p-8 bg-gray-50">
+        {/* Left Panel - Password List & Filters */}
+        <section className="flex flex-col w-full md:w-7/12 border border-gray-300 rounded-lg bg-white shadow-sm h-[70vh] lg:h-[100vh] px-4 py-3">
+          {/* Search & Controls */}
+          <div className="flex flex-col md:flex-row h-[100px] items-center justify-between gap-4 mb-4 md:h-[70px]">
+            <div className="flex gap-3 flex-grow min-w-0">
               <TextField
                 type="search"
                 size="small"
-                placeholder="search by name or title"
+                placeholder="Search by name or title"
                 variant="outlined"
                 fullWidth
                 value={search}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   handleSearch(e)
                 }
+                className="min-w-0"
               />
               <Button
                 variant="contained"
                 size="medium"
-                className="font-bold"
+                className="font-bold whitespace-nowrap"
                 type="button"
-                onClick={() => navigate("/AddPassword")}
+                onClick={() => navigate("/dashboard/AddPassword")}
               >
-                +ADD
+                + ADD
               </Button>
             </div>
             <select
@@ -104,7 +107,7 @@ function ListPasswords() {
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="border border-gray-300 px-2 py-2.5 focus:border-blue-700 focus:border-2 rounded-lg"
+              className="border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
             >
               <option value="">All Categories</option>
               <option value="Social">Social</option>
@@ -114,42 +117,49 @@ function ListPasswords() {
               <option value="Entertainment">Entertainment</option>
               <option value="Utilities">Utilities</option>
               <option value="Shopping">Shopping</option>
-              <option value="Others">Others</option>{" "}
+              <option value="Others">Others</option>
             </select>
           </div>
-          <div className="w-full h-[52vh] lg:h-full overflow-y-scroll hide-scrollbar">
-            {filteredPasswords.length === 0 && (
-              <p className="text-center text-gray-500 mt-4">
+
+          {/* Password List */}
+          <div className="flex-grow overflow-y-auto hide-scrollbar">
+            {filteredPasswords.length === 0 ? (
+              <p className="text-center text-gray-500 mt-8">
                 No passwords found.
               </p>
+            ) : (
+              <ListUI
+                data={filteredPasswords}
+                selected={selected}
+                setSelected={setSelected}
+              />
             )}
-            <ListUI
-              data={filteredPasswords}
-              selected={selected}
-              setSelected={setSelected}
-            />
           </div>
-        </div>
-        <div className="w-full md:w-5/12 lg:w-5/12 h-fit overflow-y-scroll hide-scrollbar">
+        </section>
+
+        {/* Right Panel - Password Details */}
+        <section className="w-full md:w-5/12 bg-white border border-gray-300 rounded-lg shadow-sm h-[70vh] lg:h-[100vh] overflow-y-auto hide-scrollbar p-6">
           {currentData ? (
             <AboutPassword
-              _id={currentData?._id}
-              logo={currentData?.logo}
-              title={currentData?.title}
-              category={currentData?.category}
-              email={currentData?.email}
-              url={currentData?.url}
-              encryptedPassword={currentData?.encryptedPassword}
-              notes={currentData?.notes}
+              _id={currentData._id}
+              logo={currentData.logo}
+              title={currentData.title}
+              category={currentData.category}
+              email={currentData.email}
+              url={currentData.url}
+              encryptedPassword={currentData.encryptedPassword}
+              notes={currentData.notes}
             />
           ) : (
-            <div className="text-center text-gray-500 p-4">
+            <div className="flex items-center justify-center h-full text-gray-400 italic">
               Select a password to view details
             </div>
           )}
-        </div>
+        </section>
       </div>
-      <div className="h-fit bg-gray-50 pb-10 px-4">
+
+      {/* Password Strength Checker */}
+      <div className="max-w-screen-xl mx-auto px-6 py-8 bg-gray-50">
         <PasswordStrengthChecker defaultPassword={currentData?.email} />
       </div>
     </>

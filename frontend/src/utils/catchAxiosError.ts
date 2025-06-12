@@ -1,11 +1,15 @@
 import { isAxiosError } from "axios"
 
-const catchAxiosError = (error: unknown, message: string) => {
+const catchAxiosError = (error: any, message: string) => {
     if (isAxiosError(error)) {
         console.log(message, error);
-        throw new Error(`${message}` )
+        const backendMessage = error.response?.data?.message || "An unexpected error occurred";
+        // Instead of throwing Error(), just return the message:
+        return backendMessage;
     }
-    throw error
+    // unknown error type, return generic message:
+    return "An unexpected error occurred";
 };
+
 
 export default catchAxiosError;

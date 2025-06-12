@@ -38,8 +38,67 @@ const groupController = {
 
 
         res.status(201).json({
-            message: "Group created Succesfully",
+            message: "Group created Successfully",
             group
+        })
+    }),
+    GetGroupById: asyncHandler(async (req, res) => {
+        const { groupId } = req.params
+        if (!mongoose.Types.ObjectId.isValid(groupId)) {
+            return res.status(400).json({
+                message: "Group Id is not valid"
+            })
+        }
+        const groupInfo = await Group.findOne({
+            _id: groupId, members: {
+                $elemMatch: {
+                    userId: req.user.id,
+                    authorized: true
+                }
+            }
+        }).populate("ownerId", "firstName lastName email").populate("passwordId", "title email url notes encryptedPassword iv category").populate("members.userId", "name firstName lastName email");
+
+        if (!groupInfo) {
+            return res.status(404).json({
+                message: "Group does not exist. Unable to get details about the group."
+            })
+        }
+
+        res.status(200).json({
+            message: "Group Info fetched successfully",
+            group: {
+                id: groupInfo._id,
+                name: groupInfo.name,
+                type: groupInfo.type,
+                ownerName: `${groupInfo.ownerId.firstName} ${groupInfo.ownerId.lastName}`,
+                description: groupInfo.description,
+                expiresAt: groupInfo.expiresAt,
+                createdAt: groupInfo.createdAt,
+                userCount: groupInfo.members.length,
+                passwordCount: groupInfo.passwordId.length,
+                salt: groupInfo.salt
+            },
+            passwords: groupInfo.passwordId?.map(password => {
+                return {
+                    _id: password._id,
+                    title: password.title,
+                    email: password.email,
+                    url: password.url,
+                    notes: password.notes,
+                    encryptedPassword: password.encryptedPassword,
+                    iv: password.iv,
+                    category: password.category
+
+                }
+            }),
+            members: groupInfo.members?.map(member => {
+                return {
+                    _id: member.userId._id,
+                    email: member.userId.email,
+                    name: `${member.userId.firstName} ${member.userId.lastName}`,
+                    authorized: member.authorized
+                }
+            })
         })
     }),
     updateGroup: asyncHandler(async (req, res) => {
@@ -231,13 +290,13 @@ const groupController = {
             authorizedUsers: members,
             passwordId,
         })
+        group.passwordId.push(passwordId)
+
+        await group.save()
 
         res.status(201).json({
             message: "group authorized successfully"
-        })
-
-
-
+        });
     }),
     toggleAuthorizeGroup: asyncHandler(async (req, res) => {
         const { groupId } = req.params;
@@ -346,6 +405,7 @@ const groupController = {
             groupPasswords
         })
     }),
+
 
 }
 

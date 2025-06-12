@@ -7,13 +7,13 @@ const authorizedGroupSchema = new mongoose.Schema({
         required: true,
     },
     encryptedPassword: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Password",
+        type: String,
         required: true
     },
     expiresAt: {
         type: Date,
     },
+    // TODO: check if this is still needed for the current logic
     authorizedUsers: [{ userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" } }],
     authorized: {
         type: Boolean,

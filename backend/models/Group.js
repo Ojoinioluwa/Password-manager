@@ -49,14 +49,10 @@ const groupSchema = new mongoose.Schema({
         required: true,
         default: true
     },
-    passwordId: {
+    passwordId: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Password"
-    }
-    // image: {
-    //     type: String,
-    //     required: true
-    // }
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Group", groupSchema);

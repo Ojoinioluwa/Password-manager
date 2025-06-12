@@ -25,33 +25,50 @@ export const ListUI = ({ setSelected, selected, data }: ListUiProps) => {
   };
 
   return (
-    <div className="flex flex-col items-start">
+    <div className="flex flex-col items-start w-full space-y-2">
       {data.map((password: Password) => {
         const domain = extractDomain(password.url);
         const imgUrl = domain
           ? `https://img.logo.dev/${domain}?token=${apiKey}&size=250&format=png`
           : "";
 
+        const isSelected = selected === password._id;
+
         return (
-          <div
-            key={password._id}
-            className="flex flex-col w-full py-0.5 h-fit px-1 cursor-pointer"
-          >
+          <div key={password._id} className="flex flex-col w-full">
             <div
-              onClick={() =>
-                setSelected(selected === password._id! ? null : password._id!)
-              }
-              className={`flex shadow-md justify-between w-full rounded-lg border border-gray-300 py-2 px-3 items-center h-[70px] ${
-                selected === password._id ? "bg-gray-500" : "bg-white"
+              onClick={() => setSelected(isSelected ? null : password._id!)}
+              className={`flex justify-between items-center w-full rounded-lg border transition-all duration-200 px-4 py-3 cursor-pointer ${
+                isSelected
+                  ? "bg-gray-100 border-gray-400 shadow-inner"
+                  : "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
               }`}
             >
-              <div className="flex gap-3 items-center">
-                <Avatar src={imgUrl} alt={`${password.title} logo`} />
-                <p className="text-sm font-medium inline">{password.title}</p>
-                <p className="text-xs font-light inline">- {password.title}</p>
+              <div className="flex items-center gap-4">
+                <Avatar
+                  src={imgUrl}
+                  alt={`${password.title} logo`}
+                  className="w-10 h-10"
+                />
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold text-gray-800">
+                    {password.title}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {password.url || "-"}
+                  </p>
+                </div>
               </div>
-              <IconButton aria-label="toggle expand">
-                {selected === password._id ? <NorthIcon /> : <SouthIcon />}
+              <IconButton
+                aria-label="toggle expand"
+                size="small"
+                className="text-gray-600 hover:text-gray-800"
+              >
+                {isSelected ? (
+                  <NorthIcon fontSize="small" />
+                ) : (
+                  <SouthIcon fontSize="small" />
+                )}
               </IconButton>
             </div>
           </div>

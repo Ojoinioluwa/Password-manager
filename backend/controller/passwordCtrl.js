@@ -7,7 +7,7 @@ const validator = require("validator")
 const passwordController = {
     addPassword: asyncHandler(async (req, res) => {
         const { title, email, url, notes, encryptedPassword, iv, category } = req.body
-        if (!title || !url || !encryptedPassword || !iv) {
+        if (!title || !encryptedPassword || !iv) {
             res.status(400)
             throw new Error("Fill in all required fields")
         }
@@ -29,7 +29,7 @@ const passwordController = {
             email,
             iv,
             userId: req.user.id,
-            category: category ? category.toUpperCase() : "OTHERS"
+            category: category ? category : "Others"
 
         })
 
@@ -39,7 +39,6 @@ const passwordController = {
     }),
     getAllPasswords: asyncHandler(async (req, res) => {
         const passwords = await Password.find({ userId: req.user.id }).lean()
-
         if (passwords.length === 0) {
             res.status(200).json({
                 message: "There is no password. add password"

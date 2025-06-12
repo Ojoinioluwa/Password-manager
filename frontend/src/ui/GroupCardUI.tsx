@@ -8,32 +8,45 @@ export const GroupCardUI = ({ group }) => {
     name,
     type,
     description,
+    _id,
     // Optional future fields like imageUrl can go here
   } = group;
 
   const navigate = useNavigate();
-  const groupId = 123;
+
   return (
-    <div className="flex flex-col bg-white shadow hover:shadow-lg hover:scale-105 transition-transform w-[200px] h-[300px]">
-      <div className="h-[200px] w-full overflow-hidden">
+    <div
+      className="flex flex-col bg-white rounded-xl shadow-md hover:shadow-xl hover:scale-[1.03] transition-transform duration-300 w-[220px] h-[340px] overflow-hidden cursor-pointer border border-gray-200"
+      onClick={() => navigate(`/dashboard/groups/${groupId}`)}
+    >
+      <div className="relative h-[180px] w-full">
         <img
           src={DummyImage}
           alt={`${name} image`}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover rounded-t-xl transition-transform duration-300 hover:scale-105"
         />
+        {/* Optional gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-t-xl"></div>
       </div>
 
-      <div className="p-4 h-full w-full bg-gray-200 flex flex-col gap-2">
-        <p className="text-blue-950 text-base font-bold truncate">{name}</p>
+      <div className="flex flex-col flex-1 p-4 gap-2 bg-gray-50">
+        <p className="text-blue-950 text-lg font-semibold truncate">{name}</p>
         <p className="text-blue-950 text-sm">
-          <span className="font-semibold">Type:</span>{" "}
+          <span className="font-medium">Type:</span>{" "}
           {type.charAt(0).toUpperCase() + type.slice(1)}
         </p>
-        <p className="text-blue-950 text-xs line-clamp-2">{description}</p>
+        <p className="text-blue-950 text-xs text-justify line-clamp-3">
+          {description}
+        </p>
         <Button
           variant="outlined"
           size="small"
-          onClick={() => navigate(`/dashboard/groups/${groupId}`)}
+          fullWidth
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent parent card click
+            navigate(`/dashboard/groups/${_id}`);
+          }}
+          className="mt-auto"
         >
           View Group
         </Button>

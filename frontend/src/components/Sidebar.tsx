@@ -17,27 +17,33 @@ import { FaBars } from "react-icons/fa";
 import { IoLogoPlaystation } from "react-icons/io";
 import { Typography } from "@mui/material";
 
+interface SidebarItem {
+  name: string;
+  link: string;
+  icon: React.ReactNode;
+}
+
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
+  const [focusedItem, setFocusedItem] = React.useState<string>("groups");
   const navigate = useNavigate();
 
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
+  const toggleDrawer = (openState: boolean) => () => {
+    setOpen(openState);
   };
 
-  const [, setFocused] = React.useState("groups");
-
-  const handleChange = (value: string) => {
-    setFocused(value);
-    navigate(`/dashboard/${value}`);
+  const handleNavigation = (link: string) => {
+    setFocusedItem(link);
+    navigate(`/dashboard/${link}`);
+    setOpen(false); // close drawer after navigation
   };
 
-  const sideBar = [
-    { name: "groups", link: "groups", icon: <GroupIcon /> },
-    { name: "vault", link: "vault", icon: <LockIcon /> },
-    { name: "authorized", link: "authorized", icon: <VerifiedUserIcon /> },
+  const sidebarItems: SidebarItem[] = [
+    { name: "Groups", link: "groups", icon: <GroupIcon /> },
+    { name: "Vault", link: "vault", icon: <LockIcon /> },
+    { name: "Authorized", link: "authorized", icon: <VerifiedUserIcon /> },
     {
-      name: "Authorized passwords",
+      name: "Authorized Passwords",
       link: "authorizedPasswords",
       icon: <AssessmentIcon />,
     },
@@ -48,45 +54,68 @@ export default function TemporaryDrawer() {
     },
   ];
 
-  const DrawerList = (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
-      <List>
-        {sideBar.map((value) => (
-          <ListItem key={value.name} disablePadding>
-            <ListItemButton onClick={() => handleChange(value.link)}>
-              <ListItemIcon>{value.icon}</ListItemIcon>
-              <ListItemText
-                primary={
-                  value.name.charAt(0).toUpperCase() + value.name.slice(1)
-                }
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
-
   return (
-    <div>
-      <Button onClick={toggleDrawer(true)} sx={{ fontSize: 50 }}>
+    <>
+      <Button
+        aria-label="open drawer"
+        onClick={toggleDrawer(true)}
+        sx={{ fontSize: 32, minWidth: 0, padding: 1 }}
+      >
         <FaBars />
       </Button>
-      <Drawer open={open} onClose={toggleDrawer(false)}>
-        <Box sx={{ padding: 2, display: "flex", alignItems: "center" }}>
+
+      <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
+        <Box
+          sx={{
+            width: 260,
+            padding: 2,
+            display: "flex",
+            alignItems: "center",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          }}
+          role="presentation"
+        >
           <IoLogoPlaystation
-            style={{ fontSize: "28px", color: "#172554", marginRight: "10px" }}
+            style={{ fontSize: 28, color: "#172554", marginRight: 12 }}
+            aria-hidden="true"
           />
           <Typography
             variant="h6"
             component="h1"
-            sx={{ color: "#172554", fontSize: "30px" }}
+            sx={{ color: "#172554", fontWeight: "bold" }}
           >
             Vaulter
           </Typography>
         </Box>
-        {DrawerList}
+
+        <List>
+          {sidebarItems.map(({ name, link, icon }) => (
+            <ListItem key={link} disablePadding>
+              <ListItemButton
+                selected={focusedItem === link}
+                onClick={() => handleNavigation(link)}
+                sx={{
+                  "&.Mui-selected": {
+                    bgcolor: "primary.light",
+                    color: "primary.main",
+                    "& svg": { color: "primary.main" },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: focusedItem === link ? "primary.main" : "inherit",
+                  }}
+                >
+                  {icon}
+                </ListItemIcon>
+                <ListItemText primary={name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
       </Drawer>
-    </div>
+    </>
   );
 }

@@ -56,10 +56,12 @@ export const GetUserAPI = async () => {
     }
 };
 
-export const GetSaltAPI = async (email: string): Promise<{ message: string; salt: string } | undefined> => {
+
+// this gets the salt along with the _id for the user can be used in encryption and decryption for the authorized user
+export const GetSaltAPI = async (email: string): Promise<{ message: string; salt: string, id: string } | undefined> => {
     try {
         const encodedEmail = encodeURIComponent(email);
-        const response = await axios.get(`${BASE_URL}/getSalt?email=${encodedEmail}`);
+        const response = await axios.get(`${BASE_URL}/getSaltAndId?email=${encodedEmail}`);
         return response.data;
     } catch (error) {
         catchAxiosError(error, "GetSaltAPI");

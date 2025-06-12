@@ -38,20 +38,21 @@ const passwordSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum: 
-        [
-            "SOCIAL",
-            "BANKING",
-            "EMAIL",
-            "WORK",
-            "ENTERTAINMENT",
-            "UTILITIES",
-            "SHOPPING",
-            "OTHERS"
-        ],
+        enum:
+            [
+                "Social",
+                "Banking",
+                "Email",
+                "Work",
+                "Entertainment",
+                "Utilities",
+                "Shopping",
+                "Others"
+
+            ],
         default: "OTHERS"
     },
-  authorized: [authorizedSchema]
+    authorized: [authorizedSchema]
 }, {
     timestamps: true
 });

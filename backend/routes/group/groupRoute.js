@@ -10,6 +10,9 @@ groupRouter.post("/group/create", isAuthenticated, groupController.createGroup);
 // Update group by ID
 groupRouter.put("/group/:groupId/update", isAuthenticated, groupController.updateGroup);
 
+// Get group by Id
+groupRouter.get("/group/:groupId/groupInfo", isAuthenticated, groupController.GetGroupById)
+
 // Delete group by ID
 groupRouter.delete("/group/:groupId/delete", isAuthenticated, groupController.deleteGroup);
 
