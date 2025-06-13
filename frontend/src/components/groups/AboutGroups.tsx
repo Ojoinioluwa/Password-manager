@@ -1,18 +1,24 @@
-import { Button, Divider, TextField } from "@mui/material";
-import type { Password } from "../../types/passwordType"; // Assuming this is correct
-import { useMemo, useState } from "react";
+import {
+  Button,
+  Divider,
+  TextField,
+  Modal,
+  Box,
+  Typography,
+} from "@mui/material";
+import type { Password } from "../../types/passwordType";
+import { useMemo, useState, useEffect } from "react";
 import GroupCard from "../../ui/GroupCard";
 import { useNavigate, useParams } from "react-router-dom";
-import { IconButton } from "@mui/material";
-
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; // Commented out as table is commented
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined"; // Commented out as table is commented
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"; // Commented out as table is commented
-import ToggleOnIcon from "@mui/icons-material/ToggleOn"; // Commented out as table is commented
-import ToggleOffIcon from "@mui/icons-material/ToggleOff"; // Commented out as table is commented
-import EditIcon from "@mui/icons-material/Edit"; // Commented out as table is commented
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import ToggleOnIcon from "@mui/icons-material/ToggleOn";
+import ToggleOffIcon from "@mui/icons-material/ToggleOff";
+import EditIcon from "@mui/icons-material/Edit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  GetAuthorizedPasswordInfoAPI,
   GetGroupById,
   LeaveGroupAPI,
   RemoveMemberAPI,
@@ -21,6 +27,27 @@ import {
 import { ListUI } from "../../ui/ListUI";
 import Loading from "../../State/Loading";
 import { toast } from "react-toastify";
+import AboutPassword from "../vault/AboutPassword";
+import { deriveMasterSecretFromPassword } from "../../utils/genMasterSecrets";
+import {
+  decrypt,
+  generateUserKey,
+} from "../../utils/encryptAndDecryptPassword";
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: { xs: "90%", sm: 500, md: 600 },
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+  maxHeight: "90vh",
+  overflowY: "auto",
+};
 
 function AboutGroups() {
   const [selectedPasswordId, setSelectedPasswordId] = useState<string | null>(
@@ -28,15 +55,20 @@ function AboutGroups() {
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [search, setSearch] = useState("");
+  const [openPasswordModal, setOpenPasswordModal] = useState(false);
+  // State to hold the decrypted password
+  const [decryptedPasswordValue, setDecryptedPasswordValue] = useState<
+    string | null
+  >(null);
+
   const queryClient = useQueryClient();
-  const { groupId } = useParams() as { groupId: string }; // Use object destructuring for clarity
+  const { groupId } = useParams() as { groupId: string };
   const navigate = useNavigate();
 
-  // Use optional chaining for safer access to groupId
   const { data: groupDetails, isLoading } = useQuery({
-    queryKey: ["groupDetails", groupId], // More descriptive query key
-    queryFn: () => GetGroupById({ groupId: groupId! }), // Assert groupId is not null/undefined here if it's guaranteed by route
-    enabled: !!groupId, // Only run query if groupId exists
+    queryKey: ["groupDetails", groupId],
+    queryFn: () => GetGroupById({ groupId: groupId! }),
+    enabled: !!groupId,
   });
 
   const { mutateAsync: leaveGroup } = useMutation({
@@ -71,7 +103,6 @@ function AboutGroups() {
     },
   });
 
-  // Destructure group and passwords for easier access
   const { group = {}, passwords = [], members = [] } = groupDetails ?? {};
 
   const filteredUsers = useMemo(() => {
@@ -83,7 +114,83 @@ function AboutGroups() {
     );
   }, [search, members]);
 
-  // handler loading state
+  // Logic for the password modal
+  const handleOpenPasswordModal = () => setOpenPasswordModal(true);
+  const handleClosePasswordModal = () => {
+    setOpenPasswordModal(false);
+    setSelectedPasswordId(null); // Reset selectedPasswordId when modal closes
+    setDecryptedPasswordValue(null); // Reset decrypted password when modal closes
+  };
+
+  console.log(decryptedPasswordValue);
+  // Effect to open modal when selectedPasswordId is set
+  useEffect(() => {
+    if (selectedPasswordId) {
+      handleOpenPasswordModal();
+    }
+  }, [selectedPasswordId]);
+
+  // Find the selected password to pass to AboutPassword component
+  const currentSelectedPassword = useMemo(() => {
+    return passwords.find(
+      (password: Password) => password._id === selectedPasswordId
+    );
+  }, [selectedPasswordId, passwords]);
+  console.log(currentSelectedPassword);
+
+  const { data: authorizedPassword } = useQuery({
+    queryKey: ["AuthorizePassword", groupId, currentSelectedPassword?._id], // Add currentSelectedPassword?._id to queryKey
+    queryFn: () =>
+      GetAuthorizedPasswordInfoAPI({
+        groupId: groupId!,
+        passwordId: currentSelectedPassword!._id, // Use _id here
+      }),
+    enabled: !!groupId && !!currentSelectedPassword?._id, // Ensure currentSelectedPassword._id exists before enabling
+  });
+  // Effect to decrypt password when currentSelectedPassword changes
+  useEffect(() => {
+    const decryptAndSetPassword = async () => {
+      if (
+        currentSelectedPassword &&
+        group.salt &&
+        group.id &&
+        authorizedPassword
+      ) {
+        try {
+          const masterSecret = await deriveMasterSecretFromPassword(
+            groupId,
+            group.salt
+          );
+          console.log("secret", masterSecret);
+
+          const key = await generateUserKey({
+            masterSecret,
+            userId: groupId,
+            salt: group.salt,
+          });
+
+          const decrypted = await decrypt({
+            encryptedHex:
+              authorizedPassword?.AuthorizedPassword?.encryptedPassword,
+            key: key,
+            ivHex: authorizedPassword?.AuthorizedPassword?.iv,
+          });
+          console.log(decrypted);
+          setDecryptedPasswordValue(decrypted);
+        } catch (error) {
+          console.error("Error decrypting password:", error);
+          setDecryptedPasswordValue("Decryption Error");
+          toast.error("Failed to decrypt password.");
+        }
+      } else {
+        setDecryptedPasswordValue(null);
+      }
+    };
+
+    decryptAndSetPassword();
+  }, [currentSelectedPassword, group.salt, group.id, groupId]); // Add groupId to dependency array
+
+  // Handle loading state
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -92,7 +199,6 @@ function AboutGroups() {
     );
   }
 
-  // Handle case where groupDetails might be undefined after loading (e.g., group not found)
   if (!groupDetails) {
     return (
       <div className="flex h-screen w-full items-center justify-center text-red-500">
@@ -108,7 +214,7 @@ function AboutGroups() {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
-  // Filter passwords based on search term
+
   const filteredPasswords = passwords.filter((password: Password) =>
     password.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -123,6 +229,7 @@ function AboutGroups() {
       console.error("Toggle failed:", err);
     }
   };
+
   const handleToggle = async (userId: string) => {
     try {
       await toggleUser({ groupId, userId });
@@ -145,29 +252,28 @@ function AboutGroups() {
     }
   };
 
-  const handleEdit = (user) => {
-    // Example: open edit modal or navigate with user data
-    console.log("Edit user:", user);
-    navigate(""); // Adjust this later
+  const handleEdit = () => {
+    navigate(`/dashboard/editGroup/${groupId}`);
   };
 
-  // Handle loading state
+  // Removed the local decryptPassword function as it's now integrated into useEffect.
+  // The decrypt function from '../../utils/encryptAndDecryptPassword' is directly used.
 
   return (
     <div className="flex items-center justify-center p-5">
       <div className="flex w-full flex-col rounded-lg bg-gray-200 p-4 shadow md:w-[80vw] lg:w-[60vw]">
         {/* Header Section */}
-        <div className="flex items-center justify-between p-3">
+        <div className="flex-col md:flex-row items-center justify-between p-3 gap-3">
           <h4 className="text-2xl font-bold text-blue-950">About Group</h4>
-          <div className="flex flex-col gap-3 p-1 md:flex-row">
+          <div className="flex gap-3 p-1">
             <Button
               variant="contained"
               onClick={() => navigate(`/dashboard/addMember/${groupId}`)}
             >
-              Add
+              Add Member
             </Button>
-            <Button variant="contained" color="info">
-              Edit
+            <Button variant="contained" color="info" onClick={handleEdit}>
+              Edit Group
             </Button>
             <Button
               variant="contained"
@@ -178,7 +284,7 @@ function AboutGroups() {
             </Button>
           </div>
         </div>
-        <Divider className="my-4" /> {/* Add margin for better spacing */}
+        <Divider className="my-4" />
         {/* Group Information Card */}
         <div className="mx-auto w-full max-w-3xl">
           <GroupCard group={group} />
@@ -198,7 +304,7 @@ function AboutGroups() {
                 fullWidth
                 value={searchTerm}
                 onChange={handleSearchChange}
-                placeholder="Search passwords..." // Add placeholder
+                placeholder="Search passwords..."
               />
               <Button
                 variant="contained"
@@ -208,7 +314,7 @@ function AboutGroups() {
                   navigate(`/dashboard/AuthorizeGroup/${group.id}`)
                 }
               >
-                + ADD
+                ADD
               </Button>
             </div>
           </div>
@@ -217,7 +323,7 @@ function AboutGroups() {
               <ListUI
                 selected={selectedPasswordId}
                 setSelected={setSelectedPasswordId}
-                data={filteredPasswords} // Use filtered passwords
+                data={filteredPasswords}
               />
             </div>
           </div>
@@ -250,7 +356,7 @@ function AboutGroups() {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user, index) => (
+              {filteredUsers.map((user: any, index: number) => (
                 <tr
                   key={user._id}
                   className={`${
@@ -286,13 +392,16 @@ function AboutGroups() {
                           <ToggleOffIcon color="disabled" fontSize="small" />
                         )}
                       </button>
-                      <button
-                        onClick={() => handleEdit(user)}
+                      {/* not in use for now */}
+                      {/* <button
+                        onClick={() => {
+                          handleEdit(user) 
+                        }}
                         title="Edit"
                         className="p-1 rounded-md hover:bg-blue-100 transition"
                       >
                         <EditIcon fontSize="small" />
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => handleRemoveMember(user._id)}
                         title="Delete"
@@ -308,6 +417,53 @@ function AboutGroups() {
           </table>
         </div>
       </div>
+
+      {/* Password Details Modal */}
+      <Modal
+        open={openPasswordModal}
+        onClose={handleClosePasswordModal}
+        aria-labelledby="password-modal-title"
+        aria-describedby="password-modal-description"
+      >
+        <Box sx={modalStyle}>
+          <Typography
+            id="password-modal-title"
+            variant="h6"
+            component="h2"
+            mb={2}
+          >
+            Password Details
+          </Typography>
+          {currentSelectedPassword && decryptedPasswordValue !== null ? (
+            <AboutPassword
+              _id={currentSelectedPassword._id}
+              logo={currentSelectedPassword.logo}
+              title={currentSelectedPassword.title}
+              category={currentSelectedPassword.category}
+              email={currentSelectedPassword.email}
+              url={currentSelectedPassword.url}
+              // Pass the decrypted value from state
+              encryptedPassword={decryptedPasswordValue}
+              notes={currentSelectedPassword.notes}
+              display={false}
+            />
+          ) : (
+            <Typography id="password-modal-description" sx={{ mt: 2 }}>
+              {currentSelectedPassword
+                ? "Loading password details..."
+                : "No password selected or data not found."}
+            </Typography>
+          )}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleClosePasswordModal}
+            sx={{ mt: 3 }}
+          >
+            Close
+          </Button>
+        </Box>
+      </Modal>
     </div>
   );
 }

@@ -35,6 +35,21 @@ export const AddAuthorizedUserAPI = async ({
     }
 };
 
+export const GetAuthorizedPasswordsAPI = async () => {
+    try {
+        const user = await getUserFromStorage();
+        const token = user?.token;
+        const response = await axios.get(`${BASE_URL}/authorize/passwords`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        catchAxiosError(error, "GetAuthorizedPasswordsAPI");
+        throw error;
+    }
+};
 export const GetAuthorizedUsersAPI = async () => {
     try {
         const user = await getUserFromStorage();

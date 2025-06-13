@@ -115,13 +115,14 @@ const groupController = {
 
         if (!group) {
             res.status(404)
+            console.log("Group does not exist")
             throw new Error("Group does not exist")
         }
 
-        if (description !== undefined) group.description = description;
-        if (name !== undefined) group.name = name;
-        if (expiresAt !== undefined) group.expiresAt = expiresAt
-        if (type !== undefined) group.type = type;
+        if (description) group.description = description;
+        if (name) group.name = name;
+        if (expiresAt) group.expiresAt = expiresAt
+        if (type) group.type = type;
 
         await group.save();
         res.status(200).json({
@@ -324,6 +325,13 @@ const groupController = {
             throw new Error("Group not found or unauthorized");
         }
 
+        if (userId.toString() === req.user.id.toString()) {
+            return res.status(400).json({
+                message: "Can not toggle owner of group"
+            });
+
+        }
+
         // Find the member and toggle their authorization
         const member = group.members.find(member => member.userId.toString() === userId.toString());
 
@@ -405,6 +413,22 @@ const groupController = {
             groupPasswords
         })
     }),
+    // !this is for getting authorized passwords for groups
+    getAuthorizedPasswordById: asyncHandler(async (req, res) => {
+        const { passwordId, groupId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(passwordId)) {
+            return res.status(400).json({
+                message: "PasswordId Id is not valid"
+            })
+        }
+
+        const AuthorizedPassword = await AuthorizedGroup.findOne({ passwordId, groupId }).lean();
+
+        res.status(200).json({
+            message: "Authorized Password Info fetched successfully",
+            AuthorizedPassword
+        })
+    })
 
 
 }

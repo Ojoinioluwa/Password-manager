@@ -69,7 +69,7 @@ const authorizedUserController = {
     getAuthorizedUsers: asyncHandler(async (req, res) => {
         const authorizedUsers = await AuthorizedUser.find({
             ownerId: req.user.id
-        }).populate("authorizedId", "firstName email").lean();
+        }).populate("authorizedId", "firstName email").populate("passwordId", "title").lean();
         res.status(200).json({
             message: "Authorized users fetched successfully",
             authorizedUsers
@@ -146,7 +146,54 @@ const authorizedUserController = {
             message: "User status changed successfully",
             authorized: authorizedUser.authorized
         });
+    }),
+
+    getAllAuthorizedPasswords: asyncHandler(async (req, res) => {
+        if (!mongoose.Types.ObjectId.isValid(req.user.id)) {
+            return res.status(400).json({
+                message: "Invalid User id"
+            })
+        }
+
+        const authorizedPasswords = await AuthorizedUser.find({
+            authorizedId: req.user.id,
+            authorized: true,
+            $or: [
+                { expiresAt: { $gte: new Date() } }, // not expired
+                { expiresAt: { $exists: false } },   // field is missing
+                { expiresAt: null }                  // field is explicitly null
+            ]
+        })
+            .populate("passwordId", "title url notes email category")
+            .populate("ownerId", "firstName lastName email")
+            .lean();
+
+
+        if (!authorizedPasswords.length) {
+            return res.status(200).json({
+                message: "No authorized passwords found",
+                authorizedPasswords: []
+            });
+        }
+
+
+        res.status(200).json({
+            message: "all Authorized passwords fetched",
+            authorizedPasswords,
+            passwords: authorizedPasswords.map((password => {
+                return {
+                    _id: password.passwordId._id,
+                    category: password.passwordId.category,
+                    email: password.passwordId.email,
+                    url: password.passwordId.url,
+                    title: password.passwordId.title,
+                    notes: password.passwordId.notes,
+                }
+            }))
+        })
     })
+
+
 }
 
 module.exports = authorizedUserController

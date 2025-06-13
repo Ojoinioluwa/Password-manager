@@ -5,7 +5,7 @@ import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import EditIcon from "@mui/icons-material/Edit";
 import { useMemo, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   GetAuthorizedUsersAPI,
   ToggleAuthorizedUserAPI,
@@ -13,10 +13,12 @@ import {
 } from "../../../services/Authorize/authorizeService";
 import Loading from "../../../State/Loading";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function ListAuthorizedUsers() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: authorizedUsers, isLoading } = useQuery({
     queryKey: ["GetAuthorizedUsers"],
@@ -26,17 +28,29 @@ function ListAuthorizedUsers() {
   const { mutateAsync: toggleUser } = useMutation({
     mutationKey: ["ToggleAuthorizedUser"],
     mutationFn: ToggleAuthorizedUserAPI,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["GetAuthorizedUsers"],
+      });
+    },
   });
 
   const { mutateAsync: deleteUser } = useMutation({
     mutationKey: ["DeleteAuthorizedUser"],
     mutationFn: DeleteAuthorizedUserAPI,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["GetAuthorizedUsers"],
+      });
+    },
   });
 
   const handleToggle = async (authorizedId: string) => {
     try {
       await toggleUser({ authorizedId });
+      toast.success("User Toggled Successfully");
     } catch (err) {
+      toast.error(`An Error Occurred ${err}`);
       console.error("Toggle failed:", err);
     }
   };
@@ -45,28 +59,31 @@ function ListAuthorizedUsers() {
     if (confirm("Are you sure you want to delete this user?")) {
       try {
         await deleteUser({ authorizedId });
+        toast.success("User Deleted Successfully");
       } catch (err) {
+        toast.error(`An Error Occurred deleting the user ${err}`);
         console.error("Delete failed:", err);
       }
     }
   };
 
-  const handleEdit = (user) => {
-    // Example: open edit modal or navigate with user data
-    console.log("Edit user:", user);
-    navigate(""); // Adjust this later
+  const handleEdit = (authorizedId: string) => {
+    navigate(`/dashboard/editAuthorized/${authorizedId}`); // Adjust this later
   };
+  console.log(authorizedUsers);
 
   const filteredUsers = useMemo(() => {
     if (!authorizedUsers) return [];
     return authorizedUsers.authorizedUsers.filter(
-      (user) =>
+      (user: { authorizedId: { firstName: string; email: string } }) =>
         user.authorizedId.firstName
           .toLowerCase()
           .includes(search.toLowerCase()) ||
         user.authorizedId.email.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, authorizedUsers]);
+
+  console.log(filteredUsers);
 
   if (isLoading) {
     return (
@@ -92,7 +109,7 @@ function ListAuthorizedUsers() {
               <th className="p-3 border border-gray-200 text-left">Name</th>
               <th className="p-3 border border-gray-200 text-left">Email</th>
               <th className="p-3 border border-gray-200 text-left">
-                Password Name
+                Password Title
               </th>
               <th className="p-3 border border-gray-200 text-center">Status</th>
               <th className="p-3 border border-gray-200 text-left">
@@ -104,9 +121,9 @@ function ListAuthorizedUsers() {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user, index) => (
+            {filteredUsers.map((user, index: number) => (
               <tr
-                key={user.encryptedPassword}
+                key={user._id || index}
                 className={`${
                   index % 2 === 0 ? "bg-white" : "bg-gray-50"
                 } hover:bg-blue-50 transition-colors duration-150`}
@@ -119,7 +136,7 @@ function ListAuthorizedUsers() {
                 </td>
                 <td className="p-3 border border-gray-200 whitespace-nowrap text-gray-600">
                   {/* Assuming you have user.passwordName */}
-                  {user.passwordName || "N/A"}
+                  {user.passwordId?.title || "N/A"}
                 </td>
                 <td className="p-3 border border-gray-200 text-center">
                   {user.authorized ? (
@@ -135,7 +152,7 @@ function ListAuthorizedUsers() {
                 </td>
                 <td className="p-3 border border-gray-200 flex justify-center space-x-3">
                   <button
-                    onClick={() => handleToggle(user.authorizedId)}
+                    onClick={() => handleToggle(user._id)}
                     title="Toggle Authorization"
                     className="p-1 rounded hover:bg-green-100 transition"
                   >
@@ -146,14 +163,14 @@ function ListAuthorizedUsers() {
                     )}
                   </button>
                   <button
-                    onClick={() => handleEdit(user)}
+                    onClick={() => handleEdit(user._id)}
                     title="Edit"
                     className="p-1 rounded hover:bg-blue-100 transition"
                   >
                     <EditIcon fontSize="small" />
                   </button>
                   <button
-                    onClick={() => handleDelete(user.authorizedId)}
+                    onClick={() => handleDelete(user._id)}
                     title="Delete"
                     className="p-1 rounded hover:bg-red-100 transition"
                   >

@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AddAuthorizedUserAPI } from "../../../services/Authorize/authorizeService";
 import { ButtonUI } from "../../../ui/ButtonUI";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { GetSaltAPI, GetUserAPI } from "../../../services/user/userServices";
 import {
@@ -31,6 +31,7 @@ interface RootState {
 
 function AuthorizeUser() {
   const { passwordId } = useParams() as { passwordId: string };
+  const navigate = useNavigate();
   const [debouncedEmail, setDebouncedEmail] = useState("");
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["AuthorizeUser"],
@@ -64,7 +65,7 @@ function AuthorizeUser() {
     onSubmit: async (values) => {
       try {
         if (!passwordId || !saltAndIdData?.salt || !UserData?.user) {
-          toast.error("Missing necessary data");
+          toast.error("Missing necessary data, Please wait a while");
 
           return;
         }
@@ -98,6 +99,7 @@ function AuthorizeUser() {
           iv: encrypted.iv,
         });
         toast.success("User Authorized Successfully");
+        navigate(-1);
       } catch (error) {
         console.log(error);
         toast.error(`Authorization failed, ${error}`);
@@ -122,11 +124,7 @@ function AuthorizeUser() {
     };
   }, [formik.values.email]);
 
-  const {
-    data: saltAndIdData,
-    isError,
-    error,
-  } = useQuery({
+  const { data: saltAndIdData } = useQuery({
     queryKey: ["GetSalt", debouncedEmail],
     queryFn: () => GetSaltAPI(debouncedEmail),
     enabled: !!debouncedEmail,

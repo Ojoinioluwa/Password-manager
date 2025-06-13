@@ -42,5 +42,6 @@ groupRouter.put("/group/:groupId/authorizeGroup/:authorizeGroupId/toggleAuthoriz
 
 // Get group password info
 groupRouter.get("/group/:groupId/passwordInfo", isAuthenticated, groupController.getPasswordInfo);
+groupRouter.get("/group/:groupId/authorizedPassword/:passwordId", isAuthenticated, groupController.getAuthorizedPasswordById);
 
 module.exports = groupRouter;

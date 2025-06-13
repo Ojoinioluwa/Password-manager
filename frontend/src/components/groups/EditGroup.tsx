@@ -1,10 +1,10 @@
 import { InputField } from "../../ui/InputUI";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ButtonUI } from "../../ui/ButtonUI";
 import { UpdateGroupAPI } from "../../services/group/groupServices";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const validationSchema = Yup.object({
@@ -16,9 +16,16 @@ const validationSchema = Yup.object({
 
 function EditGroup() {
   const { groupId } = useParams() as { groupId: string };
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["EditGroup"],
     mutationFn: UpdateGroupAPI,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["groupDetails"],
+      });
+    },
   });
 
   const formik = useFormik({
@@ -31,15 +38,16 @@ function EditGroup() {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const data = await mutateAsync({
+        await mutateAsync({
           name: values.name,
           expiresAt: values.expiresAt,
           type: values.type,
           description: values.description,
-          groupId: groupId!,
+          groupId: groupId,
         });
-        console.log(data);
-        toast.success("Group added successfully");
+        formik.resetForm();
+        toast.success("Group Edited successfully");
+        navigate(-1);
       } catch (error) {
         console.log(error);
         toast.error("An error Occurred");
@@ -54,7 +62,7 @@ function EditGroup() {
       >
         <div className="bg-gray-100 px-2 py-3 rounded-lg shadow">
           <h2 className="text-blue-950 text-base font-bold text-center mb-3">
-            Create Group
+            Edit Group info
           </h2>
         </div>
         <InputField

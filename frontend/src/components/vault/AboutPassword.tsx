@@ -20,6 +20,7 @@ type About = {
   url?: string;
   encryptedPassword?: string;
   notes?: string;
+  display?: boolean;
 };
 
 function AboutPassword({
@@ -30,6 +31,7 @@ function AboutPassword({
   url,
   encryptedPassword,
   notes,
+  display = true,
 }: About) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -84,7 +86,11 @@ function AboutPassword({
   return (
     <div className="px-6 py-4 border border-gray-200 rounded-lg bg-white w-full h-full shadow-sm">
       {/* Actions */}
-      <div className="flex gap-3 justify-end py-2">
+      <div
+        className={`flex gap-3 justify-end py-2 ${
+          !display ? "hidden" : "block"
+        }`}
+      >
         <Button
           size="small"
           variant="outlined"

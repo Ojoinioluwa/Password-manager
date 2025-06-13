@@ -20,6 +20,9 @@ authorizedUserRouter.put("/authorize/user/:authorizedId/edit", isAuthenticated, 
 // editAuthorizedUser
 authorizedUserRouter.put("/authorize/user/:authorizedId/toggleAuthorize", isAuthenticated, authorizedUserController.toggleAuthorizedUser);
 
+// get authorized PASSWORDS
+authorizedUserRouter.get("/authorize/passwords", isAuthenticated, authorizedUserController.getAllAuthorizedPasswords);
+
 
 
 module.exports = authorizedUserRouter

@@ -289,3 +289,26 @@ export const GetPasswordInfoAPI = async ({ groupId }: { groupId: string }) => {
     throw error;
   }
 };
+
+export const GetAuthorizedPasswordInfoAPI = async ({
+  groupId,
+  passwordId,
+}: {
+  groupId: string;
+  passwordId: string;
+}) => {
+  try {
+    const user = await getUserFromStorage();
+    const token = user?.token;
+    const response = await axios.get(
+      `${BASE_URL}/group/${groupId}/authorizedPassword/${passwordId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    catchAxiosError(error, "GetAuthorizedPasswordInfoAPI");
+    throw error;
+  }
+};
