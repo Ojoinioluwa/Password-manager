@@ -12,12 +12,21 @@ import {
 } from "../services/Authorize/authorizeService";
 import { useQueryClient } from "@tanstack/react-query";
 
+type AuthorizedUser = {
+  firstName: string;
+  email: string;
+  password: { name: string };
+  authorized: boolean;
+  authorizedId: string;
+  expiresAt?: string;
+};
+
 function ListAuthorizedUsersUI({
   message,
   authorizedUsers,
 }: {
   message: string;
-  authorizedUsers: any;
+  authorizedUsers: AuthorizedUser[];
 }) {
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
@@ -52,8 +61,8 @@ function ListAuthorizedUsersUI({
     }
   };
 
-  const handleEdit = (user: any) => {
-    console.log("Edit user:", user);
+  const handleEdit = (id: string) => {
+    console.log("Edit user:", id);
     // Replace this with openModal(user) or navigate(`/edit/${user.authorizedId}`)
   };
 
@@ -94,7 +103,7 @@ function ListAuthorizedUsersUI({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 overflow-y-scroll">
-            {filteredUsers.map((user: any, index: number) => (
+            {filteredUsers.map((user: AuthorizedUser, index: number) => (
               <tr
                 key={index}
                 className={`hover:bg-purple-50 ${
@@ -155,7 +164,7 @@ function ListAuthorizedUsersUI({
                   <EditIcon
                     className="text-blue-500 cursor-pointer hover:text-blue-700"
                     fontSize="medium"
-                    onClick={() => handleEdit(user)}
+                    onClick={() => handleEdit(user.authorizedId)}
                     titleAccess="Edit User"
                   />
                 </td>

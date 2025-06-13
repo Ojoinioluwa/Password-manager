@@ -14,6 +14,21 @@ import {
 } from "../../../utils/encryptAndDecryptPassword";
 import { toast } from "react-toastify";
 
+type Group = {
+  passwordId: string;
+  userSalt: string;
+  userId: string;
+  encryptedPassword: string;
+  passwordIv: string;
+  _id: string;
+  logo: string;
+  category: string;
+  email: string;
+  url: string;
+  notes: string;
+  title: string;
+};
+
 function AuthorizedPasswords() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["GetAuthorizedPasswords"],
@@ -24,7 +39,7 @@ function AuthorizedPasswords() {
   const [category, setCategory] = useState("");
 
   const [selected, setSelected] = useState<string | null>(null);
-  const [currentData, setCurrentData] = useState<any | null>(null);
+  const [currentData, setCurrentData] = useState<Group | null>(null);
   const [decryptedPasswordValue, setDecryptedPasswordValue] = useState<
     string | null
   >(null);
@@ -171,6 +186,7 @@ function AuthorizedPasswords() {
         </section>
 
         {/* Right Panel - Password Details */}
+
         <section className="w-full md:w-5/12 bg-white border border-gray-300 rounded-lg shadow-sm h-[70vh] lg:h-[100vh] overflow-y-auto hide-scrollbar p-6">
           {currentData ? (
             <AboutPassword

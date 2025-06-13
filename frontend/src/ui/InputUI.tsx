@@ -10,6 +10,7 @@ export const InputField = ({
   size = "medium",
   helperText,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formik: FormikProps<any>;
   isPending: boolean;
   name: string;

@@ -18,6 +18,24 @@ import { toast } from "react-toastify";
 interface RootState {
   auth: { masterSecret: string };
 }
+
+type CurrentData = {
+  passwordId: string;
+  userSalt: string;
+  encryptedPassword: string;
+  iv: string;
+  _id: string;
+  logo: string;
+  category: string;
+  email: string;
+  url: string;
+  notes: string;
+  title: string;
+  userId: {
+    _id: string;
+    salt: string;
+  };
+};
 function ListPasswords() {
   const navigate = useNavigate();
   const masterSecret = useSelector(
@@ -32,7 +50,7 @@ function ListPasswords() {
   const [category, setCategory] = useState("");
 
   const [selected, setSelected] = useState<string | null>(null);
-  const [currentData, setCurrentData] = useState<any | null>(null);
+  const [currentData, setCurrentData] = useState<CurrentData | null>(null);
   const [decryptedPasswordValue, setDecryptedPasswordValue] = useState<
     string | null
   >(null);

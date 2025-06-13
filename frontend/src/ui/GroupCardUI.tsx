@@ -3,7 +3,13 @@ import { Button } from "@mui/material";
 import DummyImage from "../assets/login.jpeg";
 import { useNavigate } from "react-router-dom";
 
-export const GroupCardUI = ({ group }) => {
+type Group = {
+  name: string;
+  type: string;
+  description: string;
+  _id: string;
+};
+export const GroupCardUI = ({ group }: { group: Group }) => {
   const {
     name,
     type,
@@ -17,7 +23,7 @@ export const GroupCardUI = ({ group }) => {
   return (
     <div
       className="flex flex-col bg-white rounded-xl shadow-md hover:shadow-xl hover:scale-[1.03] transition-transform duration-300 w-[220px] h-[340px] overflow-hidden cursor-pointer border border-gray-200"
-      onClick={() => navigate(`/dashboard/groups/${groupId}`)}
+      onClick={() => navigate(`/dashboard/groups/${_id}`)}
     >
       <div className="relative h-[180px] w-full">
         <img
