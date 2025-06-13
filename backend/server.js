@@ -9,7 +9,7 @@ const cors = require("cors");
 const passwordRouter = require("./routes/password/passwordRoute");
 const authorizedUserRouter = require("./routes/authorizedUser/authorizedUserRoute");
 const groupRouter = require("./routes/group/groupRoute");
-// const groupRouter = require("./routes/group/groupROute");
+
 
 const app = express();
 const PORT = process.env.PORT || 8000
@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 8000
 // connect to mongoDB
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
-        console.log("MongoDb connected succesfully")
+        console.log("MongoDb connected successfully")
     })
     .catch((err) => {
         console.log("error connecting to the database")
