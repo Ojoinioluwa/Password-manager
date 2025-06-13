@@ -27,7 +27,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 const allowedOrigin =
     process.env.NODE_ENV === 'production'
-        ? '' // replace with your real domain
+        ? 'https://password-manager-frontend-mzof.onrender.com/' // replace with your real domain
         : 'http://localhost:5173';
 
 app.use(cors({
