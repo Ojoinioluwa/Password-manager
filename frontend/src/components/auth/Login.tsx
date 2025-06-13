@@ -90,8 +90,8 @@ function LoginForm() {
 
     const fetchSalt = debounce(async () => {
       try {
-        const res = await GetSaltAPI(email);
-        setSalt(res.salt);
+        const { salt } = (await GetSaltAPI(email)) as { salt: string };
+        setSalt(salt!);
       } catch (error) {
         console.error("Failed to fetch salt:", error);
         setSalt(null);

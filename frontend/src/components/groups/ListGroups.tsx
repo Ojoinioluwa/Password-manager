@@ -7,18 +7,43 @@ import GroupOffIcon from "@mui/icons-material/GroupOff";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 
+// ==============================
+// Define types locally
+// ==============================
+type Group = {
+  _id: string;
+  name: string;
+  type: string;
+  description: string;
+  // Add more fields if needed
+};
+
+type GetGroupsResponse = {
+  groups: Group[];
+};
+
 function ListGroups() {
   const navigate = useNavigate();
 
+  // ==============================
+  // Use typed query
+  // ==============================
   const {
     data: groups,
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<GetGroupsResponse>({
     queryKey: ["GetGroups"],
     queryFn: GetGroupsUserAPI,
   });
 
+  const handleAddGroup = () => {
+    navigate("/dashboard/AddGroup");
+  };
+
+  // ==============================
+  // Loading state
+  // ==============================
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -27,10 +52,9 @@ function ListGroups() {
     );
   }
 
-  const handleAddGroup = () => {
-    navigate("/dashboard/AddGroup");
-  };
-
+  // ==============================
+  // Empty or Error state
+  // ==============================
   if (isError || !groups || groups.groups.length === 0) {
     return (
       <div className="w-full h-screen flex flex-col items-center justify-center text-center px-4">
@@ -51,6 +75,9 @@ function ListGroups() {
     );
   }
 
+  // ==============================
+  // Success state
+  // ==============================
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-6">

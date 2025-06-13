@@ -1,6 +1,18 @@
 import Avatar from "@mui/material/Avatar";
 
-export default function GroupCard({ group }) {
+type Group = {
+  name: string;
+  type: string;
+  ownerName: string;
+  description: string;
+  userCount: number;
+  passwordCount: number;
+  createdAt: Date;
+  expiresAt: Date;
+  avatarUrl: string;
+};
+
+export default function GroupCard({ group }: { group: Group }) {
   const {
     name,
     type,
