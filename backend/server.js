@@ -25,9 +25,14 @@ mongoose.connect(process.env.MONGODB_URI)
         console.log(err)
     })
 
+const allowedOrigin =
+    process.env.NODE_ENV === 'production'
+        ? '' // replace with your real domain
+        : 'http://localhost:5173';
+
 app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true,
+    origin: allowedOrigin,
+    credentials: true, // allows sending cookies/auth headers
 }));
 
 
