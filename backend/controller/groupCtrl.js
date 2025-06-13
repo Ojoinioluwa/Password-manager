@@ -115,7 +115,6 @@ const groupController = {
 
         if (!group) {
             res.status(404)
-            console.log("Group does not exist")
             throw new Error("Group does not exist")
         }
 

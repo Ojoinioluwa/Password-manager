@@ -15,7 +15,7 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
-import EditIcon from "@mui/icons-material/Edit";
+// import EditIcon from "@mui/icons-material/Edit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   GetAuthorizedPasswordInfoAPI,
@@ -188,7 +188,13 @@ function AboutGroups() {
     };
 
     decryptAndSetPassword();
-  }, [currentSelectedPassword, group.salt, group.id, groupId]); // Add groupId to dependency array
+  }, [
+    currentSelectedPassword,
+    group.salt,
+    group.id,
+    groupId,
+    authorizedPassword,
+  ]);
 
   // Handle loading state
   if (isLoading) {
@@ -356,44 +362,53 @@ function AboutGroups() {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user: any, index: number) => (
-                <tr
-                  key={user._id}
-                  className={`${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                  } hover:bg-blue-50 transition-colors duration-150`}
-                >
-                  <td className="p-3 border border-gray-200 font-medium text-gray-800 whitespace-nowrap">
-                    {user.name}
-                  </td>
-                  <td className="p-3 border border-gray-200 text-gray-600 whitespace-nowrap">
-                    {user.email}
-                  </td>
-                  <td className="p-3 border border-gray-200 text-center">
-                    {user.authorized ? (
-                      <CheckCircleOutlineIcon
-                        color="success"
-                        fontSize="small"
-                      />
-                    ) : (
-                      <CancelOutlinedIcon color="error" fontSize="small" />
-                    )}
-                  </td>
-                  <td className="p-3 border border-gray-200 text-center">
-                    <div className="flex items-center justify-center space-x-2">
-                      <button
-                        onClick={() => handleToggle(user._id)}
-                        title="Toggle Authorization"
-                        className="p-1 rounded-md hover:bg-green-100 transition"
-                      >
-                        {user.authorized ? (
-                          <ToggleOnIcon color="success" fontSize="small" />
-                        ) : (
-                          <ToggleOffIcon color="disabled" fontSize="small" />
-                        )}
-                      </button>
-                      {/* not in use for now */}
-                      {/* <button
+              {filteredUsers.map(
+                (
+                  user: {
+                    _id: string;
+                    email: string;
+                    authorized: boolean;
+                    name: string;
+                  },
+                  index: number
+                ) => (
+                  <tr
+                    key={user._id}
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    } hover:bg-blue-50 transition-colors duration-150`}
+                  >
+                    <td className="p-3 border border-gray-200 font-medium text-gray-800 whitespace-nowrap">
+                      {user.name}
+                    </td>
+                    <td className="p-3 border border-gray-200 text-gray-600 whitespace-nowrap">
+                      {user.email}
+                    </td>
+                    <td className="p-3 border border-gray-200 text-center">
+                      {user.authorized ? (
+                        <CheckCircleOutlineIcon
+                          color="success"
+                          fontSize="small"
+                        />
+                      ) : (
+                        <CancelOutlinedIcon color="error" fontSize="small" />
+                      )}
+                    </td>
+                    <td className="p-3 border border-gray-200 text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <button
+                          onClick={() => handleToggle(user._id)}
+                          title="Toggle Authorization"
+                          className="p-1 rounded-md hover:bg-green-100 transition"
+                        >
+                          {user.authorized ? (
+                            <ToggleOnIcon color="success" fontSize="small" />
+                          ) : (
+                            <ToggleOffIcon color="disabled" fontSize="small" />
+                          )}
+                        </button>
+                        {/* not in use for now */}
+                        {/* <button
                         onClick={() => {
                           handleEdit(user) 
                         }}
@@ -402,17 +417,18 @@ function AboutGroups() {
                       >
                         <EditIcon fontSize="small" />
                       </button> */}
-                      <button
-                        onClick={() => handleRemoveMember(user._id)}
-                        title="Delete"
-                        className="p-1 rounded-md hover:bg-red-100 transition"
-                      >
-                        <DeleteOutlineIcon color="error" fontSize="small" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        <button
+                          onClick={() => handleRemoveMember(user._id)}
+                          title="Delete"
+                          className="p-1 rounded-md hover:bg-red-100 transition"
+                        >
+                          <DeleteOutlineIcon color="error" fontSize="small" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         </div>

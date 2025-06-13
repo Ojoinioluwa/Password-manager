@@ -5,9 +5,18 @@ import FlashOnIcon from "@mui/icons-material/FlashOn";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import GroupIcon from "@mui/icons-material/Group";
+import { Link, useNavigate } from "react-router-dom";
 
 // FeatureCard component, now styled with Tailwind CSS
-const FeatureCard = ({ icon: Icon, title, description }) => (
+const FeatureCard = ({
+  icon: Icon,
+  title,
+  description,
+}: {
+  description: string;
+  title: string;
+  icon: React.ElementType;
+}) => (
   <div className="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center text-center transform transition duration-300 hover:scale-105 hover:shadow-2xl">
     {/* Material UI Icon rendered directly */}
     <Icon className="text-blue-400 mb-4" style={{ fontSize: 60 }} />
@@ -17,15 +26,14 @@ const FeatureCard = ({ icon: Icon, title, description }) => (
 );
 
 const LandingPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 font-inter">
-      {/* Tailwind CSS import - necessary for the Canvas environment to recognize Tailwind classes */}
-      <script src="https://cdn.tailwindcss.com"></script>
       {/* Header */}
       <header className="py-6 px-4 md:px-8 bg-gray-900 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
           <a href="#" className="text-2xl font-bold text-blue-500">
-            SecureVault
+            Vaulter
           </a>
           <nav>
             <ul className="flex space-x-6">
@@ -38,12 +46,20 @@ const LandingPage = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="#cta"
+                <Link
+                  to="/Login"
                   className="hover:text-blue-400 transition duration-200"
                 >
-                  Get Started
-                </a>
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/Register"
+                  className="hover:text-blue-400 transition duration-200"
+                >
+                  Sign Up
+                </Link>
               </li>
             </ul>
           </nav>
@@ -67,7 +83,10 @@ const LandingPage = () => {
             Effortlessly manage, secure, and share your credentials with peace
             of mind.
           </p>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+          <button
+            onClick={() => navigate("/Register")}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105"
+          >
             Get Started Free
           </button>
         </div>
@@ -129,10 +148,13 @@ const LandingPage = () => {
             Ready to Experience True Password Security?
           </h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Join thousands of users who trust SecureVault to protect their
-            digital lives. Get started in seconds.
+            Join thousands of users who trust Vaulter to protect their digital
+            lives. Get started in seconds.
           </p>
-          <button className="bg-white text-blue-700 hover:bg-gray-100 font-bold py-4 px-10 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+          <button
+            onClick={() => navigate("/Register")}
+            className="bg-white text-blue-700 hover:bg-gray-100 font-bold py-4 px-10 rounded-full shadow-lg transition duration-300 transform hover:scale-105"
+          >
             Sign Up for Free
           </button>
         </div>
@@ -141,9 +163,7 @@ const LandingPage = () => {
       {/* Footer */}
       <footer className="py-8 px-4 md:px-8 bg-gray-900 text-center text-gray-400">
         <div className="container mx-auto">
-          <p>
-            &copy; {new Date().getFullYear()} SecureVault. All rights reserved.
-          </p>
+          <p>&copy; {new Date().getFullYear()} Vaulter. All rights reserved.</p>
           <p className="mt-2">
             <a href="#" className="hover:text-white mx-2">
               Privacy Policy

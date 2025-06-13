@@ -23,6 +23,7 @@ import EditGroup from "./components/groups/EditGroup";
 import EditAuthorizeUser from "./components/vault/authorize/EditAuthorizeUser";
 import AuthorizedPasswords from "./components/vault/authorize/AuthorizedPasswords";
 import LandingPage from "./components/LandingPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -32,28 +33,33 @@ function App() {
         <Route path="/Login" element={<LoginForm />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/VerifyEmail" element={<VerifyEmail />} />
-        <Route path="/dashboard" element={<MainDashboard />}>
-          <Route path="EditPassword/:passwordId" element={<EditPassword />} />
-          <Route index element={<ListPasswords />} />
-          <Route path="vault" element={<ListPasswords />} />
-          <Route path="test" element={<Test />} />
-          <Route path="authorize/:passwordId" element={<AuthorizeUser />} />
-          <Route path="authorized" element={<ListAuthorizedUsers />} />
-          <Route path="AddPassword" element={<AddPassword />} />
-          <Route path="addGroup" element={<AddGroup />} />
-          <Route path="groups/:groupId" element={<AboutGroups />} />
-          <Route path="groups" element={<ListGroups />}></Route>
-          <Route
-            path="authorizedPasswords"
-            element={<AuthorizedPasswords />}
-          ></Route>
-          <Route path="AuthorizeGroup/:groupId" element={<AuthorizeGroup />} />
-          <Route path="addMember/:groupId" element={<AddMember />} />
-          <Route path="editGroup/:groupId" element={<EditGroup />} />
-          <Route
-            path="editAuthorized/:authorizedId"
-            element={<EditAuthorizeUser />}
-          />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<MainDashboard />}>
+            <Route path="EditPassword/:passwordId" element={<EditPassword />} />
+            <Route index element={<ListPasswords />} />
+            <Route path="vault" element={<ListPasswords />} />
+            <Route path="test" element={<Test />} />
+            <Route path="authorize/:passwordId" element={<AuthorizeUser />} />
+            <Route path="authorized" element={<ListAuthorizedUsers />} />
+            <Route path="AddPassword" element={<AddPassword />} />
+            <Route path="addGroup" element={<AddGroup />} />
+            <Route path="groups/:groupId" element={<AboutGroups />} />
+            <Route path="groups" element={<ListGroups />}></Route>
+            <Route
+              path="authorizedPasswords"
+              element={<AuthorizedPasswords />}
+            ></Route>
+            <Route
+              path="AuthorizeGroup/:groupId"
+              element={<AuthorizeGroup />}
+            />
+            <Route path="addMember/:groupId" element={<AddMember />} />
+            <Route path="editGroup/:groupId" element={<EditGroup />} />
+            <Route
+              path="editAuthorized/:authorizedId"
+              element={<EditAuthorizeUser />}
+            />
+          </Route>
         </Route>
         {/* <Route path="/strength" element={<PasswordStrengthChecker />} /> */}
         <Route path="/email" element={<EmailPwnedChecker />} />

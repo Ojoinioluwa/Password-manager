@@ -65,7 +65,7 @@ function AuthorizeGroup() {
     onSubmit: async (values) => {
       try {
         const selectedPassword = data?.passwords?.find(
-          (password) => password._id === values.passwordId
+          (password: { _id: string }) => password._id === values.passwordId
         );
         if (!groupId || !groupInfo?.group?.salt || !UserData?.user) {
           toast.error("Missing necessary data");

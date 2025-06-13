@@ -11,30 +11,27 @@ import { EditPasswordAPI } from "../../services/password/passwordServices";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { GetUserAPI } from "../../services/user/userServices";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface RootState {
-  auth: { masterSecrets: string };
+  auth: { masterSecret: string };
 }
 
 const validationSchema = Yup.object({
-  email: Yup.string().email().required("Email Field is required"),
   password: Yup.string().required("Password Field is required"),
-  url: Yup.string().url(),
-  notes: Yup.string(),
-  title: Yup.string().required("Title field is required"),
-  category: Yup.string().required("Category field is required"),
 });
 
 function EditPassword() {
   const masterSecret = useSelector(
-    (state: RootState) => state.auth.masterSecrets
+    (state: RootState) => state.auth.masterSecret
   );
+  const navigate = useNavigate();
 
   const { passwordId } = useParams();
   const { data } = useQuery({
     queryKey: ["GetUser"],
     queryFn: GetUserAPI,
+    // enabled,
   });
 
   const { mutateAsync, isPending } = useMutation({
@@ -49,20 +46,25 @@ function EditPassword() {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const key = await generateUserKey({
-          masterSecret,
-          userId: data.user._id,
-          salt: data.user.salt,
-        });
-        const encrypted = await encrypt({ password: values.password, key });
-        const response = await mutateAsync({
-          encryptedPassword: encrypted.data,
-          iv: encrypted.iv,
-          passwordId: passwordId!,
-        });
-        toast.success("Password Added Successfully");
-        formik.resetForm();
-        console.log(response.data);
+        if (data) {
+          const key = await generateUserKey({
+            masterSecret,
+            userId: data.user._id,
+            salt: data.user.salt,
+          });
+          const encrypted = await encrypt({ password: values.password, key });
+          await mutateAsync({
+            encryptedPassword: encrypted.data,
+            iv: encrypted.iv,
+            passwordId: passwordId!,
+          });
+          toast.success("Password Added Successfully");
+          formik.resetForm();
+          navigate(-1);
+          // console.log(response.data);
+        } else {
+          toast.error("Wait for fetching of data from the database");
+        }
       } catch (error) {
         toast.error(`An error occurred ${error}`);
       }

@@ -121,64 +121,82 @@ function ListAuthorizedUsers() {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user, index: number) => (
-              <tr
-                key={user._id || index}
-                className={`${
-                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                } hover:bg-blue-50 transition-colors duration-150`}
-              >
-                <td className="p-3 border border-gray-200 whitespace-nowrap font-medium text-gray-800">
-                  {user.authorizedId.firstName}
-                </td>
-                <td className="p-3 border border-gray-200 whitespace-nowrap text-gray-600">
-                  {user.authorizedId.email}
-                </td>
-                <td className="p-3 border border-gray-200 whitespace-nowrap text-gray-600">
-                  {/* Assuming you have user.passwordName */}
-                  {user.passwordId?.title || "N/A"}
-                </td>
-                <td className="p-3 border border-gray-200 text-center">
-                  {user.authorized ? (
-                    <CheckCircleOutlineIcon color="success" fontSize="small" />
-                  ) : (
-                    <CancelOutlinedIcon color="error" fontSize="small" />
-                  )}
-                </td>
-                <td className="p-3 border border-gray-200 whitespace-nowrap text-gray-600">
-                  {user.expiresAt
-                    ? new Date(user.expiresAt).toLocaleDateString()
-                    : "No expiry"}
-                </td>
-                <td className="p-3 border border-gray-200 flex justify-center space-x-3">
-                  <button
-                    onClick={() => handleToggle(user._id)}
-                    title="Toggle Authorization"
-                    className="p-1 rounded hover:bg-green-100 transition"
-                  >
+            {filteredUsers.map(
+              (
+                user: {
+                  _id: string;
+                  authorizedId: {
+                    firstName: string;
+                    email: string;
+                    lastName: string;
+                  };
+                  authorized: boolean;
+                  passwordId: { title: string };
+                  expiresAt: Date;
+                },
+                index: number
+              ) => (
+                <tr
+                  key={user._id || index}
+                  className={`${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  } hover:bg-blue-50 transition-colors duration-150`}
+                >
+                  <td className="p-3 border border-gray-200 whitespace-nowrap font-medium text-gray-800">
+                    {user.authorizedId.firstName}
+                  </td>
+                  <td className="p-3 border border-gray-200 whitespace-nowrap text-gray-600">
+                    {user.authorizedId.email}
+                  </td>
+                  <td className="p-3 border border-gray-200 whitespace-nowrap text-gray-600">
+                    {/* Assuming you have user.passwordName */}
+                    {user.passwordId?.title || "N/A"}
+                  </td>
+                  <td className="p-3 border border-gray-200 text-center">
                     {user.authorized ? (
-                      <ToggleOnIcon color="success" fontSize="small" />
+                      <CheckCircleOutlineIcon
+                        color="success"
+                        fontSize="small"
+                      />
                     ) : (
-                      <ToggleOffIcon color="disabled" fontSize="small" />
+                      <CancelOutlinedIcon color="error" fontSize="small" />
                     )}
-                  </button>
-                  <button
-                    onClick={() => handleEdit(user._id)}
-                    title="Edit"
-                    className="p-1 rounded hover:bg-blue-100 transition"
-                  >
-                    <EditIcon fontSize="small" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user._id)}
-                    title="Delete"
-                    className="p-1 rounded hover:bg-red-100 transition"
-                  >
-                    <DeleteOutlineIcon color="error" fontSize="small" />
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="p-3 border border-gray-200 whitespace-nowrap text-gray-600">
+                    {user.expiresAt
+                      ? new Date(user.expiresAt).toLocaleDateString()
+                      : "No expiry"}
+                  </td>
+                  <td className="p-3 border border-gray-200 flex justify-center space-x-3">
+                    <button
+                      onClick={() => handleToggle(user._id)}
+                      title="Toggle Authorization"
+                      className="p-1 rounded hover:bg-green-100 transition"
+                    >
+                      {user.authorized ? (
+                        <ToggleOnIcon color="success" fontSize="small" />
+                      ) : (
+                        <ToggleOffIcon color="disabled" fontSize="small" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleEdit(user._id)}
+                      title="Edit"
+                      className="p-1 rounded hover:bg-blue-100 transition"
+                    >
+                      <EditIcon fontSize="small" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user._id)}
+                      title="Delete"
+                      className="p-1 rounded hover:bg-red-100 transition"
+                    >
+                      <DeleteOutlineIcon color="error" fontSize="small" />
+                    </button>
+                  </td>
+                </tr>
+              )
+            )}
           </tbody>
         </table>
       </div>

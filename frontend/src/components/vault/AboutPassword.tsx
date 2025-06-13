@@ -36,7 +36,6 @@ function AboutPassword({
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
-  console.log(_id);
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(encryptedPassword as string);
@@ -84,7 +83,7 @@ function AboutPassword({
   }
 
   return (
-    <div className="px-6 py-4 border border-gray-200 rounded-lg bg-white w-full h-full shadow-sm">
+    <div className="px-6 py-4 border border-gray-200 rounded-lg bg-white w-full h-fit shadow-sm">
       {/* Actions */}
       <div
         className={`flex gap-3 justify-end py-2 ${
@@ -114,7 +113,7 @@ function AboutPassword({
           variant="contained"
           color="secondary"
           startIcon={<EditIcon />}
-          onClick={() => navigate(`EditPassword/${_id}`)}
+          onClick={() => navigate(`/dashboard/EditPassword/${_id}`)}
         >
           Edit
         </Button>

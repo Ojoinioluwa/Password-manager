@@ -165,7 +165,7 @@ const authorizedUserController = {
             ]
         })
             .populate("passwordId", "title url notes email category")
-            .populate("ownerId", "firstName lastName email")
+            .populate("ownerId", "firstName lastName email").populate("authorizedId", "salt")
             .lean();
 
 
@@ -188,6 +188,12 @@ const authorizedUserController = {
                     url: password.passwordId.url,
                     title: password.passwordId.title,
                     notes: password.passwordId.notes,
+                    userSalt: password.authorizedId.salt,
+                    userId: password.authorizedId._id,
+                    passwordIv: password.iv,
+                    encryptedPassword: password.encryptedPassword,
+                    passwordId: password.passwordId._id,
+
                 }
             }))
         })

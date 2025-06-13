@@ -41,7 +41,7 @@ export const GetUserAPI = async () => {
         const token = user?.token;
 
         if (!token) {
-            alert("Toke not found")
+            alert("Token not found")
             throw new Error("No token found in storage");
         }
 
@@ -50,6 +50,7 @@ export const GetUserAPI = async () => {
                 Authorization: `Bearer ${token}`
             }
         });
+        console.log(response.data, "data profile")
         return response.data;
     } catch (error) {
         catchAxiosError(error, "GetUserAPI");

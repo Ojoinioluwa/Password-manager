@@ -38,7 +38,7 @@ const passwordController = {
         })
     }),
     getAllPasswords: asyncHandler(async (req, res) => {
-        const passwords = await Password.find({ userId: req.user.id }).lean()
+        const passwords = await Password.find({ userId: req.user.id }).populate("userId", "salt").lean()
         if (passwords.length === 0) {
             res.status(200).json({
                 message: "There is no password. add password"
@@ -76,6 +76,7 @@ const passwordController = {
         if (iv) password.iv = iv;
 
         await password.save();
+        console.log()
 
         res.status(200).json({
             message: "Password info updated successfully"

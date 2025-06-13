@@ -6,6 +6,7 @@ const sendMail = require("../utils/sendMail");
 const UserVerification = require("../models/UserVerification");
 const validator = require("validator");
 const { createSalt } = require("../utils/genSalt");
+const { default: mongoose } = require("mongoose");
 
 
 
@@ -167,9 +168,15 @@ const userController = {
 
     // get user profile
     getUserProfile: asyncHandler(async (req, res) => {
+        if (!mongoose.Types.ObjectId.isValid(req.user.id)) {
+            return res.status(400).json({
+                message: "UserId is invalid"
+            })
+
+        }
         const user = await User.findById(req.user.id).select("-password").lean();
         if (!user) {
-            res.status(401)
+            res.status(404)
             throw new Error("User does not exist please try again")
         }
 

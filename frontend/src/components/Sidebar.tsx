@@ -15,7 +15,10 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { IoLogoPlaystation } from "react-icons/io";
-import { Typography } from "@mui/material";
+import { Divider, Typography } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useDispatch } from "react-redux";
+import { logoutAction } from "../redux/slice/authSlice";
 
 interface SidebarItem {
   name: string;
@@ -27,6 +30,7 @@ export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
   const [focusedItem, setFocusedItem] = React.useState<string>("groups");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const toggleDrawer = (openState: boolean) => () => {
     setOpen(openState);
@@ -36,6 +40,13 @@ export default function TemporaryDrawer() {
     setFocusedItem(link);
     navigate(`/dashboard/${link}`);
     setOpen(false); // close drawer after navigation
+  };
+
+  const handleLogout = () => {
+    navigate("/");
+    localStorage.removeItem("masterSecret");
+    localStorage.removeItem("userInfo");
+    dispatch(logoutAction());
   };
 
   const sidebarItems: SidebarItem[] = [
@@ -114,7 +125,19 @@ export default function TemporaryDrawer() {
               </ListItemButton>
             </ListItem>
           ))}
+          <Divider />
         </List>
+        <div className="px-3">
+          <Button
+            fullWidth
+            variant="contained"
+            color="error"
+            onClick={handleLogout}
+            startIcon={<LogoutIcon />}
+          >
+            Logout
+          </Button>
+        </div>
       </Drawer>
     </>
   );

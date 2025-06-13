@@ -7,9 +7,15 @@ import PasswordStrengthChecker from "../../../ui/PasswordStrength";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "../../../State/Loading";
 import { GetAuthorizedPasswordsAPI } from "../../../services/Authorize/authorizeService";
+import { deriveMasterSecretFromPassword } from "../../../utils/genMasterSecrets";
+import {
+  decrypt,
+  generateUserKey,
+} from "../../../utils/encryptAndDecryptPassword";
+import { toast } from "react-toastify";
 
 function AuthorizedPasswords() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["GetAuthorizedPasswords"],
     queryFn: GetAuthorizedPasswordsAPI,
   });
@@ -18,19 +24,24 @@ function AuthorizedPasswords() {
   const [category, setCategory] = useState("");
 
   const [selected, setSelected] = useState<string | null>(null);
-  const [currentData, setCurrentData] = useState<Password | null>(null);
+  const [currentData, setCurrentData] = useState<any | null>(null);
+  const [decryptedPasswordValue, setDecryptedPasswordValue] = useState<
+    string | null
+  >(null);
 
   const filteredPasswords = useMemo(() => {
     if (!data?.authorizedPasswords) return [];
-    return data.passwords.filter((password) => {
-      const matchesSearch = password.title
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      const matchesCategory =
-        category === "" ||
-        password.category.toLowerCase() === category.toLowerCase();
-      return matchesSearch && matchesCategory;
-    });
+    return data.passwords.filter(
+      (password: { category: string; title: string }) => {
+        const matchesSearch = password.title
+          .toLowerCase()
+          .includes(search.toLowerCase());
+        const matchesCategory =
+          category === "" ||
+          password.category.toLowerCase() === category.toLowerCase();
+        return matchesSearch && matchesCategory;
+      }
+    );
   }, [search, category, data]);
 
   const handleSearch = useCallback(
@@ -51,6 +62,39 @@ function AuthorizedPasswords() {
     setCurrentData(item ?? null);
   }, [selected, data]);
 
+  useEffect(() => {
+    const decryptAndSetPassword = async () => {
+      if (currentData) {
+        try {
+          const masterSecret = await deriveMasterSecretFromPassword(
+            currentData.passwordId,
+            currentData.userSalt
+          );
+          const key = await generateUserKey({
+            masterSecret,
+            userId: currentData.userId,
+            salt: currentData.userSalt,
+          });
+          const password = await decrypt({
+            encryptedHex: currentData.encryptedPassword,
+            key: key,
+            ivHex: currentData.passwordIv,
+          });
+          console.log(password);
+          setDecryptedPasswordValue(password);
+        } catch (error) {
+          console.error("Error decrypting password:", error);
+          setDecryptedPasswordValue("Decryption Error");
+          toast.error("Failed to decrypt password.");
+        }
+      } else {
+        setDecryptedPasswordValue(null);
+      }
+    };
+
+    decryptAndSetPassword();
+  }, [currentData, selected]);
+
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -59,15 +103,15 @@ function AuthorizedPasswords() {
     );
   }
 
-  // if (isError) {
-  //   return (
-  //     <div className="w-full h-screen flex items-center justify-center">
-  //       <p className="text-red-500 text-lg">
-  //         Error loading passwords. Try again later.
-  //       </p>
-  //     </div>
-  //   );
-  // }
+  if (isError) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <p className="text-red-500 text-lg">
+          Error loading passwords. Try again later.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -136,7 +180,7 @@ function AuthorizedPasswords() {
               category={currentData.category}
               email={currentData.email}
               url={currentData.url}
-              encryptedPassword={currentData.encryptedPassword}
+              encryptedPassword={decryptedPasswordValue!}
               notes={currentData.notes}
               display={false}
             />
@@ -150,7 +194,7 @@ function AuthorizedPasswords() {
 
       {/* Password Strength Checker */}
       <div className="max-w-screen-xl mx-auto px-6 py-8 bg-gray-50">
-        <PasswordStrengthChecker defaultPassword={currentData?.email} />
+        <PasswordStrengthChecker defaultPassword={decryptedPasswordValue!} />
       </div>
     </>
   );
