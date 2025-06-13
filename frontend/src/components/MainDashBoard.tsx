@@ -9,7 +9,7 @@ function MainDashboard() {
       <NavBar />
 
       {/* Main Content Area: pushes down below fixed navbar */}
-      <main className="flex-grow bg-gray-100 p-6 pt-24">
+      <main className="flex-grow bg-gray-100 p-2 pt-24">
         <Outlet />
       </main>
     </div>

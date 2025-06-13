@@ -130,9 +130,9 @@ function AuthorizedPasswords() {
 
   return (
     <>
-      <div className="w-full max-w-screen-xl mx-auto flex flex-col md:flex-row gap-6 p-8 bg-gray-50">
+      <div className="w-full max-w-screen-xl mx-auto flex flex-col md:flex-row gap-6 px-1 py-2 bg-gray-50">
         {/* Left Panel - Password List & Filters */}
-        <section className="flex flex-col w-full md:w-7/12 border border-gray-300 rounded-lg bg-white shadow-sm h-[70vh] lg:h-[100vh] px-4 py-3">
+        <section className="flex flex-col w-full md:w-7/12 border border-gray-300 rounded-lg bg-white shadow-sm h-[70vh] lg:h-[100vh] px-1 py-1">
           {/* Search & Controls */}
           <div className="flex flex-col md:flex-row h-[100px] items-center justify-between gap-4 mb-4 md:h-[70px]">
             <div className="flex gap-3 flex-grow min-w-0">
@@ -187,7 +187,7 @@ function AuthorizedPasswords() {
 
         {/* Right Panel - Password Details */}
 
-        <section className="w-full md:w-5/12 bg-white border border-gray-300 rounded-lg shadow-sm h-[70vh] lg:h-[100vh] overflow-y-auto hide-scrollbar p-6">
+        <section className="w-full md:w-5/12 bg-white border border-gray-300 rounded-lg shadow-sm h-[70vh] lg:h-[100vh] overflow-y-auto hide-scrollbar p-1">
           {currentData ? (
             <AboutPassword
               _id={currentData._id}
@@ -209,7 +209,7 @@ function AuthorizedPasswords() {
       </div>
 
       {/* Password Strength Checker */}
-      <div className="max-w-screen-xl mx-auto px-6 py-8 bg-gray-50">
+      <div className="max-w-screen-xl mx-auto px-1 py-2 bg-gray-50">
         <PasswordStrengthChecker defaultPassword={decryptedPasswordValue!} />
       </div>
     </>
