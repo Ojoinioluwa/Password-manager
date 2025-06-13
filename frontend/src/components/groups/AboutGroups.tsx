@@ -266,8 +266,8 @@ function AboutGroups() {
   // The decrypt function from '../../utils/encryptAndDecryptPassword' is directly used.
 
   return (
-    <div className="flex items-center justify-center p-5">
-      <div className="flex w-full flex-col rounded-lg bg-gray-200 p-4 shadow md:w-[80vw] lg:w-[60vw]">
+    <div className="flex items-center justify-center p-1">
+      <div className="flex w-full flex-col rounded-lg bg-gray-200 p-2 shadow md:w-[80vw] lg:w-[60vw]">
         {/* Header Section */}
         <div className="flex-col md:flex-row items-center justify-between p-3 gap-3">
           <h4 className="text-2xl font-bold text-blue-950">About Group</h4>

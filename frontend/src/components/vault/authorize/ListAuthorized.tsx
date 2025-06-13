@@ -94,7 +94,7 @@ function ListAuthorizedUsers() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-1">
       <input
         className="mb-4 p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         type="text"
