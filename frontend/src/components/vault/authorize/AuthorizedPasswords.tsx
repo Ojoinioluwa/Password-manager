@@ -45,7 +45,8 @@ function AuthorizedPasswords() {
   >(null);
 
   const filteredPasswords = useMemo(() => {
-    if (!data?.authorizedPasswords) return [];
+    if (!Array.isArray(data?.passwords) || data.passwords.length === 0)
+      return [];
     return data.passwords.filter(
       (password: { category: string; title: string }) => {
         const matchesSearch = password.title
@@ -64,7 +65,7 @@ function AuthorizedPasswords() {
     []
   );
   useEffect(() => {
-    if (filteredPasswords.length > 0) {
+    if (filteredPasswords?.length > 0) {
       setSelected(filteredPasswords[0]._id);
     } else {
       setSelected(null);
@@ -171,9 +172,9 @@ function AuthorizedPasswords() {
 
           {/* Password List */}
           <div className="flex-grow overflow-y-auto hide-scrollbar">
-            {filteredPasswords.length === 0 ? (
+            {filteredPasswords?.length === 0 ? (
               <p className="text-center text-gray-500 mt-8">
-                No passwords found.
+                No passwords found. Not Authorized By another User.
               </p>
             ) : (
               <ListUI

@@ -26,7 +26,7 @@ export const ListUI = ({ setSelected, selected, data }: ListUiProps) => {
 
   return (
     <div className="flex flex-col items-start w-full space-y-2">
-      {data.map((password: Password) => {
+      {data?.map((password: Password) => {
         const domain = extractDomain(password.url);
         const imgUrl = domain
           ? `https://img.logo.dev/${domain}?token=${apiKey}&size=250&format=png`

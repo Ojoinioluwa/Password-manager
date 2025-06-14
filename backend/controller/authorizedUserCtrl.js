@@ -163,10 +163,8 @@ const authorizedUserController = {
                 { expiresAt: { $exists: false } },   // field is missing
                 { expiresAt: null }                  // field is explicitly null
             ]
-        })
-            .populate("passwordId", "title url notes email category")
-            .populate("ownerId", "firstName lastName email").populate("authorizedId", "salt")
-            .lean();
+        }).populate("passwordId", "title url notes email category").populate("ownerId", "firstName lastName email").populate("authorizedId", "salt").lean()
+        console.log(authorizedPasswords)
 
 
         if (!authorizedPasswords.length) {

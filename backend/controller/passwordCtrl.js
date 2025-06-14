@@ -2,7 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const asyncHandler = require("express-async-handler");
 const Password = require("../models/Password");
-const validator = require("validator")
+const validator = require("validator");
+const AuthorizedUser = require("../models/AuthorizedUser");
 
 const passwordController = {
     addPassword: asyncHandler(async (req, res) => {
@@ -90,6 +91,7 @@ const passwordController = {
             res.status(400)
             throw new Error("Password not found or you are not authorized to delete it")
         }
+        await AuthorizedUser.deleteMany({ passwordId });
         res.status(200).json({
             message: "Password deleted Successfully"
         })
