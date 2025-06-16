@@ -34,9 +34,7 @@ A modern, secure, and user-friendly web application for managing passwords and s
 ### 🎨 User Experience
 
 - **Modern UI/UX**: Clean, intuitive interface built with modern design principles
-- **Dark/Light Theme**: Toggle between themes for comfortable viewing
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Accessibility**: WCAG 2.1 compliant with keyboard navigation and screen reader support
 
 ## 🛠️ Technology Stack
 
@@ -49,29 +47,24 @@ A modern, secure, and user-friendly web application for managing passwords and s
 ### UI & Styling
 
 - **Tailwind CSS** - Utility-first CSS framework for rapid styling
-- **Headless UI** - Unstyled, accessible UI components
-- **Heroicons** - Beautiful hand-crafted SVG icons
-- **Framer Motion** - Smooth animations and transitions
+- **Material UI** - Unstyled, accessible UI components
+- **Material ui Icons** - Beautiful hand-crafted SVG icons
 
 ### State Management & Data
 
 - **React Query (TanStack Query)** - Server state management and caching
-- **Zustand** - Lightweight client state management
-- **React Hook Form** - Performant forms with easy validation
-- **Zod** - TypeScript-first schema validation
+- **Redux** - Lightweight client state management
 
 ### Security & Authentication
 
 - **JWT Handling** - Secure token storage and management
-- **Crypto-JS** - Client-side encryption for sensitive data
+- **web crypto api** - Client-side encryption for sensitive data
 - **React Router** - Protected routes and navigation
 
 ### Development Tools
 
 - **ESLint** - Code linting and quality enforcement
 - **Prettier** - Code formatting
-- **Husky** - Git hooks for code quality
-- **Vitest** - Fast unit testing framework
 
 ## 🚀 Getting Started
 
@@ -278,25 +271,6 @@ npm run preview
 2. Publish directory: `dist`
 3. Set environment variables in site settings
 
-#### Docker
-
-```dockerfile
-# Build stage
-FROM node:18-alpine as build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-
-# Production stage
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
 ## 🔒 Security Considerations
 
 ### Client-Side Security
@@ -311,7 +285,6 @@ CMD ["nginx", "-g", "daemon off;"]
 - **JWT Token Management**: Secure token storage with automatic refresh
 - **Route Protection**: Private routes require authentication
 - **Session Management**: Automatic logout on token expiration
-- **Remember Me**: Optional persistent login with security considerations
 
 ## 📊 Performance Optimization
 
