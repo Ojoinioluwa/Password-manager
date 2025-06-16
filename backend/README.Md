@@ -1,427 +1,419 @@
-# Password Manager Backend
+# Password Vault Backend
 
-## Table of Contents
+A secure, scalable backend API for managing passwords and sensitive credentials. Built with enterprise-grade security features, collaborative sharing capabilities, and advanced password management tools.
 
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Server](#running-the-server)
-- [Environment Variables](#environment-variables)
-- [API Endpoints](#api-endpoints)
-  - [Authentication](#authentication)
-  - [Password Management](#password-management)
-- [Error Handling](#error-handling)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements & References](#acknowledgements--references)
+## 🔗 Live Demo
 
----
+**Frontend Application**: [https://password-manager-frontend-mzof.onrender.com/](https://password-manager-frontend-mzof.onrender.com/)
 
-## Project Overview
+## ✨ Features
 
-The **Password Manager backend** is a RESTful API built with **Node.js** and **Express**, designed to securely store, retrieve, and manage user credentials. All sensitive data (user passwords and stored password entries) are encrypted before being saved to the database. This project serves as the server component of a full-stack password management application and demonstrates best practices in authentication, encryption, and API design.
+- **🔐 Secure Password Storage**: Encrypted storage and retrieval of passwords with custom notes and categorization
+- **👥 Group Management**: Create and manage user groups for streamlined access control
+- **🤝 Collaborative Sharing**: Share passwords with individual users or entire groups
+- **📊 Password Analytics**: Built-in password strength analyzer with improvement recommendations
+- **🎲 Advanced Password Generator**: Customizable password generation with multiple security options
+- **🔍 Shared Password Views**: Easy access to passwords shared by other authorized users
+- **🛡️ JWT Authentication**: Secure token-based authentication system
+- **⚡ RESTful API**: Clean, well-documented API endpoints
 
-Key aspects include:
+## 🛠️ Technology Stack
 
-- **User Authentication**: Secure registration and login using **bcrypt** for password hashing and **JSON Web Tokens (JWT)** for session management.
-- **Field-Level Encryption**: Each stored password entry is encrypted using **AES-256** (via Node’s built-in crypto module), ensuring that even if the database is compromised, raw credentials cannot be read without the user’s encryption key.
-- **Modular Architecture**: Clear separation of concerns using MVC-style organization: `models/` for Mongoose schemas, `controllers/` for business logic, `routes/` for endpoint definitions, and `middleware/` for shared functionality.
+- **Runtime**: Node.js 18+
+- **Framework**: Express.js
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JSON Web Tokens (JWT)
+- **Security**: bcrypt for password hashing
+- **Validation**: express-validator
+- **Environment**: dotenv for configuration
+- **Testing**: Jest
+- **Documentation**: Swagger
 
----
+## 🚀 Getting Started
 
-## Features
+### Prerequisites
 
-- **User Registration & Login** - Register with email and password, where the password is hashed via **bcrypt** (salted).  
-  - Login with email/password to receive a signed **JWT** (expires in a configurable time window).
+Before running the application, ensure you have:
 
-- **Access-Controlled Endpoints** - Protected routes require a valid **JWT** in the `Authorization` header (Bearer token) to access password entries.
+- **Node.js** (version 18.0.0 or higher)
+- **npm** (version 8.0.0 or higher)
+- **MongoDB** (version 5.0 or higher)
+- **Git** for version control
 
-- **Password Vault CRUD** - **Create**: Add a new password entry (e.g., site name, username, encrypted password).  
-  - **Read**: Retrieve all entries for the authenticated user.  
-  - **Update**: Modify an existing entry (site name, notes, password).  
-  - **Delete**: Remove an entry permanently from the vault.
+### Installation
 
-- **Field-Level Encryption** - Each password entry is encrypted using **AES-256-CBC** (or AES-GCM) with a per-user key derived from the user’s master password. This implementation uses a unique Initialization Vector (IV) stored alongside the ciphertext for decryption.
+1. **Clone the repository**
 
-- **Environment-Driven Configuration** - Database connection string, JWT secret, and other sensitive values are retrieved from environment variables, enabling secure credentials management and flexibility across environments.
+   ```bash
+   git clone https://github.com/yourusername/password-vault-backend.git
+   cd password-vault-backend
+   ```
 
----
+2. **Install dependencies**
 
-## Tech Stack
+   ```bash
+   npm install
+   ```
 
-- **Node.js** (v14+ recommended) – JavaScript runtime for building scalable network applications.
-- **Express.js** – Fast, unopinionated, minimalist web framework for Node.js.
-- **MongoDB** – NoSQL document database for storing users and encrypted password entries.
-- **Mongoose** – Elegant MongoDB object modeling for Node.js.
-- **bcrypt** – Library for hashing passwords with salts (secure by default).
-- **JSON Web Tokens (jsonwebtoken)** – Secure, stateless user authentication tokens.
-- **Node.js Crypto Module** – Native Node.js API for performing AES-256 encryption/decryption for stored password entries.
-- **dotenv** – Module to load environment variables from a `.env` file into `process.env`.
+3. **Set up environment variables**
 
----
+   Create a `.env` file in the root directory:
 
-## Prerequisites
+   ```env
+   # Server Configuration
+   PORT=8000
+   NODE_ENV=development
 
-Before getting started, ensure you have the following installed on your local machine:
+   # Database Configuration
+   DATABASE_URL=mongodb://localhost:27017/passwordvault
 
-1.  **Node.js** (v14 or above) and **npm** (v6+).  
-2.  **MongoDB** – You can either run locally or use a managed service (e.g., MongoDB Atlas).  
-3.  **Git** – For cloning the repository.
+   # JWT Configuration (Generate a secure random string!)
+   JWT_SECRET=your_super_secure_jwt_secret_key_here_minimum_32_characters
+   JWT_EXPIRES_IN=7d
 
----
+   # Security Configuration
+   BCRYPT_ROUNDS=12
 
-## Installation
+   # CORS Configuration
+   FRONTEND_URL=http://localhost:3000
 
-1.  **Clone the repository** 
+   # Rate Limiting
+   RATE_LIMIT_WINDOW_MS=900000
+   RATE_LIMIT_MAX_REQUESTS=100
+   ```
+
+4. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+   The server will start on `http://localhost:3000`
+
+### Production Deployment
+
 ```bash
-    git clone https://github.com/Ojoinioluwa/Password-manager.git
-    cd Password-manager/backend
- ```
-2.  **Install dependencies** 
-```bash
-    npm install
-```
-3.  **Set up environment variables** Create a `.env` file in the `backend/` directory (see Configuration below for details).
-
----
-
-## Configuration
-
-Copy the `.env.example` file to `.env` and fill in the required values:
-
-```bash
-cp .env.example .env
-```
-
-Example contents of .env:
-```bash
-# Server configuration
-PORT=5000
-
-# MongoDB connection string
-MONGODB_URI=mongodb://localhost:27017/password_manager
-
-# JWT secret key
-JWT_SECRET=your_jwt_secret_here
-
-# JWT token expiry (e.g., 1h, 7d)
-JWT_EXPIRES_IN=1h
-
-# Encryption secret (used as a server‑side pepper for AES)
-ENCRYPTION_PEPPER=some_random_pepper_value
-PORT: Port on which the Express server will listen.
-
-MONGODB_URI: MongoDB connection string (local or Atlas).
-
-JWT_SECRET: Secret key used to sign JWTs securely.
-
-JWT_EXPIRES_IN: Lifespan of access tokens (e.g., 1h for one hour).
-
-# ENCRYPTION_PEPPER: Additional server‑side secret added to the encryption key derivation for extra security.
-
+npm run build
+npm start
 ```
 
-Running the Server
-After configuring environment variables, start the server in development mode:
+## 📚 API Documentation
 
-```bash
-npm run dev
-```
-This command uses nodemon for hot‑reloading, so any file changes automatically restart the server.
+### Authentication Endpoints
 
-To run in production mode:
+#### Register User
 
-```bash
-npm run start
-```
-The server will start on http://localhost:<PORT>. By default, if PORT is not set, it will listen on port 5000.
+```http
+POST /api/auth/register
+Content-Type: application/json
 
-Environment Variables
-Key	Description
-```bash
-PORT	Port number on which the server listens (default: 8000).
-MONGODB_URI	MongoDB connection string (e.g., mongodb://localhost:27017/password_manager or your Atlas URI).
-JWT_SECRET	Secret string used to sign JWTs for authentication.
-JWT_EXPIRES_IN	Expiration time for JWTs (e.g., 1h, 7d).
-ENCRYPTION_PEPPER	Additional secret used to “pepper” the AES‑256 encryption key derivation.
-```
-## API Endpoints
-Below is a summary of available endpoints. Replace <BASE_URL> with http://localhost:<PORT>/api.
-
-## Authentication
-Register a New User
-Endpoint: POST /api/auth/register
-
-Description: Registers a new user by hashing their password and saving the user record. Returns a signed JWT.
-
-Request Body:
-
-
-```json
 {
-  "email": "user@example.com",
-  "password": "P@ssw0rd!"
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "SecurePassword123!"
 }
 ```
-Response (201 Created):
+
+**Response**: `201 Created`
 
 ```json
 {
+  "message": "User registered successfully",
+  "userId": "64f7b1234567890abcdef123"
+}
+```
+
+#### Login User
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "SecurePassword123!"
+}
+```
+
+**Response**: `200 OK`
+
+```json
+{
+  "message": "Login successful",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "userId": "64f7b1234567890abcdef123",
   "user": {
-    "id": "64a1f2c3d4e5f67890123456",
-    "email": "user@example.com"
-  },
-  "token": "<jwt_token_here>"
-}
-```
-**Error Responses:**
-
-400 Bad Request: Invalid input (e.g., missing fields).
-
-409 Conflict: Email already in use (duplicate key error).
-
-500 Internal Server Error: Unexpected server error.
-
-Login User
-Endpoint: POST /api/auth/login
-
-Description: Authenticates a user by comparing the provided password against the stored bcrypt hash. Returns a signed JWT.
-
-Request Body:
-
-```json
-{
-  "email": "user@example.com",
-  "password": "P@ssw0rd!"
-}
-```
-Response (200 OK):
-
-
-```json
-{
-  "user": {
-    "id": "64a1f2c3d4e5f67890123456",
-    "email": "user@example.com"
-  },
-  "token": "<jwt_token_here>"
-}
-```
-Error Responses:
-
-400 Bad Request: Missing or malformed fields.
-
-401 Unauthorized: Invalid credentials (wrong email or password).
-
-500 Internal Server Error: Unexpected server error.
-
-Password Management
-Note: All endpoints below require an Authorization header with a valid JWT:
-
-makefile
-Copy
-Edit
-Authorization: Bearer <jwt_token_here>
-Get All Passwords
-Endpoint: GET /api/passwords/
-
-Description: Retrieves all encrypted password entries for the authenticated user.
-
-Response (200 OK):
-
-json
-Copy
-Edit
-{
-  "passwords": [
-    {
-      "_id": "64a1f2c3d4e5f67890123457",
-      "siteName": "GitHub",
-      "username": "octocat",
-      "encryptedPassword": "<base64_ciphertext>",
-      "iv": "<base64_iv>",
-      "createdAt": "2025-05-22T10:15:30.000Z"
-    },
-    ...
-  ]
-}
-Error Responses:
-
-401 Unauthorized: Missing or invalid JWT.
-
-500 Internal Server Error: Unexpected server error.
-
-Create a New Password Entry
-Endpoint: POST /api/passwords/
-
-Description: Encrypts and stores a new password entry for the user. Returns the created entry (excluding plaintext).
-
-Request Body:
-
-```json
-
-{
-  "siteName": "GitHub",
-  "username": "octocat",
-  "password": "myGHpassw0rd!"
-}
-```
-Response (201 Created):
-
-```json
-{
-  "password": {
-    "_id": "64a1f2c3d4e5f67890123457",
-    "siteName": "GitHub",
-    "username": "octocat",
-    "encryptedPassword": "<base64_ciphertext>",
-    "iv": "<base64_iv>",
-    "createdAt": "2025-05-22T10:15:30.000Z"
+    "id": "64f7b1234567890abcdef123",
+    "username": "john_doe",
+    "email": "john@example.com"
   }
 }
 ```
-Error Responses:
 
-400 Bad Request: Missing fields.
+### Password Management
 
-401 Unauthorized: Missing or invalid JWT.
+#### Create Password Entry
 
-500 Internal Server Error: Encryption or database error.
+```http
+POST /api/passwords
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
 
-Update an Existing Password Entry
-Endpoint: PATCH /api/passwords/:id
-
-Description: Updates one or more fields (e.g., siteName, username, password) of an existing entry. If password is provided, it is re‑encrypted before saving.
-
-Request Parameters:
-
-id: ID of the password entry to update (URL parameter).
-
-Request Body (any subset of fields; at least one must be present):
-
-json
 {
-  "siteName": "GitHub Enterprise",
-  "password": "newGHpassw0rd!"
+  "name": "Gmail Account",
+  "username": "john@gmail.com",
+  "password": "MySecretPassword123!",
+  "url": "https://gmail.com",
+  "notes": "Main email account",
+  "category": "Email"
 }
-Response (200 OK):
+```
+
+#### Get All Passwords
+
+```http
+GET /api/passwords
+Authorization: Bearer <your_jwt_token>
+```
+
+#### Get Specific Password
+
+```http
+GET /api/passwords/:id
+Authorization: Bearer <your_jwt_token>
+```
+
+#### Update Password
+
+```http
+PUT /api/passwords/:id
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+{
+  "name": "Updated Gmail Account",
+  "password": "NewSecurePassword456!"
+}
+```
+
+#### Delete Password
+
+```http
+DELETE /api/passwords/:id
+Authorization: Bearer <your_jwt_token>
+```
+
+#### Share Password with User
+
+```http
+POST /api/passwords/:id/share/user
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+{
+  "targetUserId": "64f7b1234567890abcdef456"
+}
+```
+
+#### Share Password with Group
+
+```http
+POST /api/passwords/:id/share/group
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+{
+  "targetGroupId": "64f7b1234567890abcdef789"
+}
+```
+
+#### Get Shared Passwords
+
+```http
+GET /api/passwords/shared-with-me
+Authorization: Bearer <your_jwt_token>
+```
+
+### Group Management
+
+#### Create Group
+
+```http
+POST /api/groups
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+{
+  "name": "Development Team",
+  "description": "Shared credentials for dev environment"
+}
+```
+
+#### Get All Groups
+
+```http
+GET /api/groups
+Authorization: Bearer <your_jwt_token>
+```
+
+#### Update Group
+
+```http
+PUT /api/groups/:id
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+{
+  "name": "Updated Team Name",
+  "description": "Updated description"
+}
+```
+
+#### Delete Group
+
+```http
+DELETE /api/groups/:id
+Authorization: Bearer <your_jwt_token>
+```
+
+#### Add Group Members
+
+```http
+POST /api/groups/:id/members
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+{
+  "userIds": ["64f7b1234567890abcdef456", "64f7b1234567890abcdef789"]
+}
+```
+
+#### Remove Group Members
+
+```http
+DELETE /api/groups/:id/members
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+{
+  "userIds": ["64f7b1234567890abcdef456"]
+}
+```
+
+### Security Tools
+
+#### Test Password Strength
+
+```http
+POST /api/tools/strength-test
+Content-Type: application/json
+
+{
+  "password": "MyPassword123!"
+}
+```
+
+**Response**: `200 OK`
 
 ```json
 {
-  "password": {
-    "_id": "64a1f2c3d4e5f67890123457",
-    "siteName": "GitHub Enterprise",
-    "username": "octocat",
-    "encryptedPassword": "<new_base64_ciphertext>",
-    "iv": "<new_base64_iv>",
-    "updatedAt": "2025-05-22T11:00:00.000Z"
-  }
+  "strength": "Strong",
+  "score": 8,
+  "recommendations": [
+    "Consider adding special characters",
+    "Increase length to 16+ characters for maximum security"
+  ],
+  "estimatedCrackTime": "centuries"
 }
 ```
-Error Responses:
 
-400 Bad Request: Invalid id format or missing fields.
+#### Generate Password
 
-401 Unauthorized: Missing or invalid JWT.
+```http
+GET /api/tools/generate-password?length=16&includeUppercase=true&includeLowercase=true&includeNumbers=true&includeSymbols=true
+```
 
-404 Not Found: No password entry with the given id.
-
-500 Internal Server Error: Encryption or database error.
-
-Delete a Password Entry
-Endpoint: DELETE /api/passwords/:id
-
-Description: Permanently deletes the specified password entry.
-
-Request Parameters:
-
-id: ID of the password entry to delete (URL parameter).
-
-Response (200 OK):
+**Response**: `200 OK`
 
 ```json
 {
-  "message": "Password entry deleted successfully"
+  "generatedPassword": "K8#mN9$vL2@pQ7!R",
+  "strength": "Very Strong",
+  "length": 16
 }
 ```
-Error Responses:
 
-400 Bad Request: Invalid id format.
+## 🔒 Security Features
 
-401 Unauthorized: Missing or invalid JWT.
+### Authentication & Authorization
 
-404 Not Found: No password entry with the given id.
+- **JWT-based Authentication**: Secure token-based authentication system
+- **Password Hashing**: bcrypt with configurable salt rounds
+- **Rate Limiting**: Prevents brute force attacks
+- **Input Validation**: Comprehensive request validation
+- **CORS Protection**: Configurable cross-origin resource sharing
 
-500 Internal Server Error: Database error.
+### Authorization Levels
 
-Error Handling
-All controllers use a centralized error middleware, which captures errors (including Mongoose validation errors) and returns consistent JSON responses with appropriate HTTP status codes.
+1. **User-Level Authorization**: Granular control over individual password access
+2. **Group-Level Authorization**: Simplified team collaboration through group sharing
+3. **Owner Permissions**: Full control over created passwords and groups
 
-Common error format:
+## 🧪 Testing
 
-json
-
-{
-  "error": {
-    "message": "Detailed error message here",
-    "status": 400
-  }
-}
-Unhandled routes return:
-
-json
-Copy
-Edit
-{
-  "error": {
-    "message": "Endpoint not found",
-    "status": 404
-  }
-}
-Testing
-Automated tests ensure the API behaves as expected. Follow these steps to run tests:
-
-**Install dev dependencies (if not already installed during npm install):**
+Run the test suite:
 
 ```bash
-npm install --save-dev jest supertest mongodb-memory-server
-```
-Run tests:
-
-```bash
+# Run all tests
 npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
 ```
-Unit tests cover controllers, utilities (e.g., encryption/decryption), and middleware.
 
-Integration tests spin up an in‑memory MongoDB instance (using mongodb-memory-server) to verify endpoints (/api/auth, /api/passwords) behave correctly under various scenarios (success, validation errors, unauthorized access).
+## 🤝 Contributing
 
-View coverage report:
-After running npm test, a coverage report is generated under coverage/. Aim for ≥ 80% coverage on core modules.
+We welcome contributions! Please follow these steps:
 
-Contributing
-Contributions are welcome! Please follow these guidelines:
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes** and add tests
+4. **Run the test suite**: `npm test`
+5. **Commit your changes**: `git commit -m 'feat: Add amazing feature'`
+6. **Push to the branch**: `git push origin feature/amazing-feature`
+7. **Open a Pull Request**
 
-Fork the repository and create a new branch for your feature or bug fix:
+### Development Guidelines
 
-bash
-Copy
-Edit
-git checkout -b feature/your-feature-name
-Follow code style:
+- Follow the existing code style
+- Write tests for new features
+- Update documentation as needed
+- Use conventional commit messages
+- Ensure all tests pass before submitting
 
-Use ESLint (Airbnb style or similar).
+## 📄 License
 
-Use Prettier for consistent formatting.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-Write tests: Any new functionality or bug fix must include unit and/or integration tests. Aim for high coverage.
+## 🆘 Support
 
-Open a pull request: Ensure your branch is up to date with main, and include a clear description of changes, testing steps, and screenshots (if relevant).
+- **Issues**: [GitHub Issues](https://github.com/yourusername/password-vault-backend/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/password-vault-backend/discussions)
+- **Email**: support@yourproject.com
 
-Code review & merge: Once approved, your changes will be merged and deployed according to the CI/CD pipeline.
+## 🗺️ Roadmap
 
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
+- [ ] Two-factor authentication (2FA)
+- [ ] Password breach monitoring
+- [ ] Advanced audit logging
+- [ ] Mobile app API extensions
+- [ ] Enterprise SSO integration
+- [ ] Advanced password policies
+- [ ] Automated password rotation
+
+---
+
+**⚠️ Security Notice**: This application handles sensitive data. Always use HTTPS in production, keep dependencies updated, and follow security best practices.

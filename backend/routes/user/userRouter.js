@@ -57,18 +57,17 @@ userRouter.post("/auth/register", userController.register);
  *                  required: true
  *                  content: 
  *                      application/json:
- *                          schema:
- *                              $ref: '#/components/schemas/User'
  *                          example: 
  *                              email: ojoinioluwa05@gmail.com
  *                              password: Ini@2005
- *                  responses:
+ *              responses:
  *                      '200':  
  *                          description: User logged in successfully
  *                      '404': 
  *                          description: User does not exist
  *                      '400':
  *                           description: bad request ensure all fields are field
+ *                      
  *                          
  * 
  */
@@ -80,7 +79,52 @@ userRouter.post('/auth/login', authLimiter, userController.login)
 userRouter.post("/auth/verify-user", userController.verifyUser)
 
 // get users profile
+
+/***
+ * @swagger
+ *      /api/v1/getUserProfile:
+ *          get:
+ *             tags: [auth]
+ *             description: Get user profile information
+ *             security:
+ *                  -bearerAuth:  []
+ *             responses:
+ *                  '200':
+ *                      description: Fetched user profile successfully
+ *                      content:
+ *                       application/json:
+ *                         example:
+ *                              message: Fetched user profile successfully
+ *                              user:
+ *                                  _id: 60b8c0f7c8a4a64f0894a2a3
+ *                                  email: inioluwaojo@gmail.com
+ *                                  firstName: Inioluwa
+ *                                  lastName: Ojo
+ *                                  phoneNumber: "08012345678"
+ *                                  salt: somesaltvaluewillbeprovided
+ *                                  verified: true
+ *                  '400': 
+ *                       description: bad request
+ *                  '404':
+ *                      description: user does not exist
+ *                  '401':
+ *                      description: Authorization token is missing or invalid
+ *                  
+ * 
+ */
 userRouter.get("/getUserProfile", isAuthenticated, userController.getUserProfile)
+
+/***
+ * @swagger
+ *      /api/v1/getSaltAndId:
+ *              get:
+ *                  tags: [auth]
+ *                  description: Get salt and the id for a user
+ *                  summary: Get the salt of a user by email
+ * 
+ *          
+ * 
+ */
 userRouter.get("/getSaltAndId", userController.getUserSaltAndId)
 
 module.exports = userRouter
