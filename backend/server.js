@@ -9,6 +9,8 @@ const cors = require("cors");
 const passwordRouter = require("./routes/password/passwordRoute");
 const authorizedUserRouter = require("./routes/authorizedUser/authorizedUserRoute");
 const groupRouter = require("./routes/group/groupRoute");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUI = require("swagger-ui-express");
 
 
 const app = express();
@@ -25,6 +27,32 @@ mongoose.connect(process.env.MONGODB_URI)
         console.log(err)
     })
 
+
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "Password Storage API",
+            version: "1.0.0",
+            description: "API for the frontend of My password Application (Vaulter)"
+        },
+        servers: [
+            {
+                url: 'http://localhost:8000',
+                description: 'Development server',
+            },
+            {
+                url: "https://password-manager-6ddw.onrender.com/api/v1",
+                description: "Production Server"
+            }
+        ],
+    },
+
+    apis: ["./routes/**/*.js", "./models/**/*.js"]
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions)
+
 const allowedOrigin =
     process.env.NODE_ENV === 'production'
         ? 'https://password-manager-frontend-mzof.onrender.com' // replace with your real domain
@@ -35,13 +63,12 @@ app.use(cors({
     credentials: true, // allows sending cookies/auth headers
 }));
 
-
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 // apply to all routes
 app.use(express.json());
 app.use(limiter)
 app.use(helmet());
-
 
 
 // consume the routes
@@ -51,12 +78,10 @@ app.use("/api/v1", authorizedUserRouter)
 app.use("/api/v1", groupRouter)
 
 
-
 // handle route not found
 app.use((req, res) => {
     res.status(404).json({ message: 'Endpoint not found' });
 });
-
 
 
 // consume the errorhandler middleware

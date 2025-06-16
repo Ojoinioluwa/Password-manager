@@ -7,6 +7,7 @@ const UserVerification = require("../models/UserVerification");
 const validator = require("validator");
 const { createSalt } = require("../utils/genSalt");
 const { default: mongoose } = require("mongoose");
+const validatePassword = require("../utils/passwordValidator");
 
 
 
@@ -40,7 +41,7 @@ const userController = {
 
         const userExist = await User.findOne({ email }).lean()
         if (userExist) {
-            res.status(401)
+            res.status(409)
             throw new Error("User Already exist, Login or make use of another email")
         }
 
@@ -63,7 +64,7 @@ const userController = {
                 email: user.email,
                 firstName: user.firstName,
             });
-            return res.status(200).json(response);
+            return res.status(201).json(response);
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message: 'Error sending confirmation email.' });
@@ -118,7 +119,7 @@ const userController = {
         const user = await User.findOne({ email })
 
         if (!user) {
-            res.status(400)
+            res.status(404)
             throw new Error("Invalid Login credentials")
         }
 
