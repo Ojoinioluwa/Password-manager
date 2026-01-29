@@ -21,7 +21,7 @@
     "crypto-js": "^4.2.0",
     "formik": "^2.4.6",
     "generate-password": "^1.7.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
